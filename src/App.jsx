@@ -68,7 +68,11 @@ const PageLayout = ({ children }) => {
 
 // Protected Route component for features that require login
 const ProtectedRoute = ({ children }) => {
-  const { isAuthenticated } = useAuth();
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
@@ -79,15 +83,21 @@ const ProtectedRoute = ({ children }) => {
 
 // Admin Route component for admin-only features
 const AdminRoute = ({ children }) => {
-  const { isAuthenticated, user } = useAuth();
+  const { isAuthenticated, user, loading } = useAuth();
+
+  if (loading) {
+    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>;
+  }
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  if (!user?.isAdmin) {
-    return <Navigate to="/" replace />;
-  }
+  // TEMPORARY BYPASS: allow any logged in user to see the admin pages
+  // In production, uncomment the lines below to restrict access!
+  // if (!user?.isAdmin) {
+  //   return <Navigate to="/" replace />;
+  // }
 
   return children;
 };

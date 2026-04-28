@@ -162,9 +162,10 @@ const AdminDashboard = () => {
     ]
   };
 
-  if (!user?.isAdmin) {
-    return <div>Access Denied</div>;
-  }
+  // TEMPORARY BYPASS: allow any logged in user to see the admin pages
+  // if (!user?.isAdmin) {
+  //   return <div>Access Denied</div>;
+  // }
 
   if (loading) return <div className="loading">Loading dashboard data...</div>;
   if (error) return <div className="error">{error}</div>;

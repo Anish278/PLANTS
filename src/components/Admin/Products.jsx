@@ -13,6 +13,7 @@ import {
   query,
   where
 } from 'firebase/firestore';
+import { uploadFile } from '../../firebase/storage';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -46,6 +47,7 @@ const Products = () => {
     sizes: '', // Comma-separated string in form
     variantPrices: '' // Format: "Size:Price, Size:Price"
   });
+  const [isUploadingImage, setIsUploadingImage] = useState(false);
 
   // Helper function to get first image from comma-separated string
   const getFirstImage = (imageField) => {
@@ -131,6 +133,35 @@ const Products = () => {
       ...prev,
       [name]: name === 'featured' ? value === 'true' : value
     }));
+  };
+
+  const handleImageUpload = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    try {
+      setIsUploadingImage(true);
+      const fileExtension = file.name.split('.').pop();
+      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
+      const path = `products/${fileName}`;
+      
+      const downloadURL = await uploadFile(file, path);
+      
+      setFormData(prev => {
+        const existingImages = prev.image ? prev.image.split(',').map(i => i.trim()).filter(Boolean) : [];
+        existingImages.push(downloadURL);
+        return {
+          ...prev,
+          image: existingImages.join(', ')
+        };
+      });
+      
+    } catch (err) {
+      console.error('Error uploading image:', err);
+      setError('Failed to upload image: ' + err.message);
+    } finally {
+      setIsUploadingImage(false);
+    }
   };
 
   const handleSubmit = async (e) => {
@@ -767,13 +798,23 @@ const Products = () => {
                   />
                 </div>
                 <div className="form-group">
-                  <label>Image URL</label>
+                  <label>Image URL (or Upload new image)</label>
+                  <div style={{ display: 'flex', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
+                    <input 
+                      type="file" 
+                      accept="image/*,video/*"
+                      onChange={handleImageUpload}
+                      disabled={isUploadingImage}
+                    />
+                    {isUploadingImage && <span style={{ color: '#007bff' }}>Uploading...</span>}
+                  </div>
                   <input
                     type="text"
                     name="image"
                     value={formData.image}
                     onChange={handleInputChange}
                     required
+                    placeholder="Enter image URL or upload using the button above"
                   />
                   {formData.image && (
                     <div className="media-preview">

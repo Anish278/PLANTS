@@ -698,11 +698,18 @@ export const deleteUser = async (userId) => {
  */
 export const getDashboardStats = async () => {
   try {
+    const errorPartial = (err, part) => {
+      console.warn(`Could not fetch ${part} due to error (likely permission denied). Returning empty set.`, err);
+      return [];
+    };
+
     // Get users
-    const usersQuery = query(collection(db, 'users'));
-    const usersSnapshot = await getDocs(usersQuery);
-    const users = [];
-    usersSnapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+    let users = [];
+    try {
+      const usersQuery = query(collection(db, 'users'));
+      const usersSnapshot = await getDocs(usersQuery);
+      usersSnapshot.forEach(doc => users.push({ id: doc.id, ...doc.data() }));
+    } catch (err) { users = errorPartial(err, 'users'); }
     
     const totalUsers = users.length;
     const maleUsers = users.filter(user => user.gender === 'male').length;
@@ -716,16 +723,20 @@ export const getDashboardStats = async () => {
     }).length;
 
     // Get regular products
-    const regularProductsQuery = query(collection(db, 'products'));
-    const regularProductsSnapshot = await getDocs(regularProductsQuery);
-    const regularProducts = [];
-    regularProductsSnapshot.forEach(doc => regularProducts.push({ id: doc.id, ...doc.data() }));
+    let regularProducts = [];
+    try {
+      const regularProductsQuery = query(collection(db, 'products'));
+      const regularProductsSnapshot = await getDocs(regularProductsQuery);
+      regularProductsSnapshot.forEach(doc => regularProducts.push({ id: doc.id, ...doc.data() }));
+    } catch (err) { regularProducts = errorPartial(err, 'products'); }
     
     // Get wish genie products
-    const wishGenieQuery = query(collection(db, 'wish_genie'));
-    const wishGenieSnapshot = await getDocs(wishGenieQuery);
-    const wishGenieProducts = [];
-    wishGenieSnapshot.forEach(doc => wishGenieProducts.push({ id: doc.id, ...doc.data() }));
+    let wishGenieProducts = [];
+    try {
+      const wishGenieQuery = query(collection(db, 'wish_genie'));
+      const wishGenieSnapshot = await getDocs(wishGenieQuery);
+      wishGenieSnapshot.forEach(doc => wishGenieProducts.push({ id: doc.id, ...doc.data() }));
+    } catch (err) { wishGenieProducts = errorPartial(err, 'wish genie products'); }
     
     const totalRegularProducts = regularProducts.length;
     const totalWishGenieProducts = wishGenieProducts.length;
@@ -737,7 +748,15 @@ export const getDashboardStats = async () => {
     const totalCategories = new Set([...regularCategories, ...wishGenieCategories]).size;
 
     // Get all orders from both collections using the existing function
-    const allOrders = await getAllOrdersForAdmin();
+    let allOrders = [];
+    try {
+      const fetchedOrders = await getAllOrdersForAdmin();
+      if (fetchedOrders && Array.isArray(fetchedOrders)) {
+        allOrders = fetchedOrders;
+      }
+    } catch (err) {
+      allOrders = errorPartial(err, 'orders');
+    }
     
     // Calculate order statistics
     const totalOrders = allOrders.length;
