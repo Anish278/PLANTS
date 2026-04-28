@@ -1,0 +1,316 @@
+.fika-blog-section {
+    padding: 80px 20px;
+    background: linear-gradient(135deg, #f8f9fa 0%, #ffffff 100%);
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+}
+
+.fika-blog-section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.1), transparent);
+}
+
+.fika-blog-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.fika-blog-header {
+    text-align: center;
+    margin-bottom: 60px;
+    animation: fikaFadeInUp 0.8s ease-out;
+}
+
+.fika-blog-title {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 12px;
+    letter-spacing: -0.5px;
+    position: relative;
+    display: inline-block;
+}
+
+.fika-blog-title::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background: linear-gradient(90deg, #8b7355, #d4a574);
+    border-radius: 2px;
+}
+
+.fika-blog-subtitle {
+    font-size: 1.1rem;
+    color: #666;
+    margin-top: 20px;
+    font-weight: 400;
+}
+
+.fika-blog-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 40px;
+    animation: fikaFadeIn 1s ease-out 0.2s both;
+}
+
+.fika-blog-card {
+    background: #ffffff;
+    border-radius: 16px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.fika-blog-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.15);
+}
+
+.fika-blog-image-wrapper {
+    position: relative;
+    width: 100%;
+    height: 280px;
+    overflow: hidden;
+    background: linear-gradient(135deg, #f5f5f5, #e0e0e0);
+}
+
+.fika-blog-image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.fika-blog-card:hover .fika-blog-image {
+    transform: scale(1.08);
+}
+
+.fika-blog-category-badge {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(10px);
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #8b7355;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.fika-blog-content {
+    padding: 32px;
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.fika-blog-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.fika-blog-date {
+    font-size: 0.9rem;
+    color: #999;
+    font-weight: 500;
+}
+
+.fika-blog-card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin-bottom: 16px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    transition: color 0.3s ease;
+}
+
+.fika-blog-card:hover .fika-blog-card-title {
+    color: #8b7355;
+}
+
+.fika-blog-excerpt {
+    font-size: 1rem;
+    color: #666;
+    line-height: 1.7;
+    margin-bottom: 24px;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    flex-grow: 1;
+}
+
+.fika-blog-read-more {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    color: #8b7355;
+    font-weight: 600;
+    font-size: 1rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    position: relative;
+    width: fit-content;
+    margin-top: auto;
+}
+
+.fika-blog-read-more::after {
+    content: '';
+    position: absolute;
+    bottom: -4px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: #8b7355;
+    transition: width 0.3s ease;
+}
+
+.fika-blog-read-more:hover::after {
+    width: calc(100% - 24px);
+}
+
+.fika-blog-read-more:hover {
+    gap: 12px;
+    color: #6d5a44;
+}
+
+.fika-blog-arrow-icon {
+    transition: transform 0.3s ease;
+}
+
+.fika-blog-read-more:hover .fika-blog-arrow-icon {
+    transform: translateX(4px);
+}
+
+/* Animations */
+@keyframes fikaFadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(30px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes fikaFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .fika-blog-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+    }
+}
+
+@media (max-width: 768px) {
+    .fika-blog-section {
+        padding: 60px 16px;
+    }
+
+    .fika-blog-title {
+        font-size: 2rem;
+    }
+
+    .fika-blog-subtitle {
+        font-size: 1rem;
+    }
+
+    .fika-blog-header {
+        margin-bottom: 40px;
+    }
+
+    .fika-blog-grid {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+
+    .fika-blog-image-wrapper {
+        height: 220px;
+    }
+
+    .fika-blog-content {
+        padding: 24px;
+    }
+
+    .fika-blog-card-title {
+        font-size: 1.3rem;
+    }
+
+    .fika-blog-excerpt {
+        font-size: 0.95rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .fika-blog-section {
+        padding: 40px 12px;
+    }
+
+    .fika-blog-title {
+        font-size: 1.75rem;
+    }
+
+    .fika-blog-subtitle {
+        font-size: 0.95rem;
+    }
+
+    .fika-blog-image-wrapper {
+        height: 200px;
+    }
+
+    .fika-blog-content {
+        padding: 20px;
+    }
+
+    .fika-blog-card-title {
+        font-size: 1.2rem;
+    }
+
+    .fika-blog-excerpt {
+        font-size: 0.9rem;
+        -webkit-line-clamp: 2;
+        line-clamp: 2;
+    }
+
+    .fika-blog-category-badge {
+        font-size: 0.75rem;
+        padding: 6px 12px;
+    }
+}

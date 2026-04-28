@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Fika-India</title>
+
+  <!-- DNS Prefetch for faster external resource loading -->
+  <link rel="dns-prefetch" href="https://checkout.razorpay.com" />
+  <link rel="dns-prefetch" href="https://www.googletagmanager.com" />
+
+  <!-- Preload critical hero images for instant display -->
+  <link rel="preload" as="image" href="/hero_image1.webp" />
+  <link rel="preload" as="image" href="/hero_image2.webp" />
+  <link rel="preload" as="image" href="/fika_page-0001.webp" />
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+  <!-- Google tag (gtag.js) -->
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-5XYHEX54M1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'G-5XYHEX54M1');
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.jsx"></script>
+</body>
+
+</html>
