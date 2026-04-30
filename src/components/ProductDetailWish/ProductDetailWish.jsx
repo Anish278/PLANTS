@@ -25,7 +25,7 @@ import { useWishlist } from "../../context/WishlistContext.jsx";
 import "./ProductDetailWish.css";
 import { useAuth } from '../../context/AuthContext';
 import LoginPrompt from '../LoginPrompt/LoginPrompt';
-import { getWishGenieProduct, getWishGenieProducts, incrementWishGenieViews, incrementWishGenieBought } from '../../firebase/firestore';
+import { getWishGenieProduct, getWishGenieProducts, incrementWishGenieViews, incrementWishGenieBought, initializeWishGenieFields } from '../../firebase/firestore';
 import { doc, onSnapshot } from 'firebase/firestore';
 import { db } from '../../firebase/config';
 
@@ -291,8 +291,13 @@ const ProductDetailWish = () => {
 
   // Get all images from the comma-separated image field
   const productImages = product.image
-    ? product.image.split(',').map(img => img.trim()).filter(Boolean).map(img => img.startsWith('/') ? img : `/${img}`)
-            : ['/placeholder-image.webp'];
+    ? product.image.split(',').map(img => img.trim()).filter(Boolean).map(img => {
+        if (img.startsWith('http') || img.startsWith('https') || img.startsWith('/')) {
+          return img;
+        }
+        return `/${img}`;
+      })
+    : ['/placeholder-image.webp'];
 
   const ProductGallery = ({ images }) => {
     const [magnifierPosition, setMagnifierPosition] = useState({ x: 0, y: 0 });

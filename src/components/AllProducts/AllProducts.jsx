@@ -3,8 +3,8 @@ import { Link, useNavigate, useLocation } from "react-router-dom";
 import { useWishlist } from "../../context/WishlistContext.jsx";
 import { useCart } from "../../context/CartContext.jsx";
 import { addReferrerToUrl } from "../../utils/navigationUtils.js";
-import { FaShoppingBag, FaHeart, FaShoppingCart, FaEye, FaTimes, FaRegHeart, FaTshirt, FaSearch, FaChevronRight, FaStar, FaStarHalfAlt, FaRegStar, FaFilter, FaSort, FaTags, FaArrowRight, FaSlidersH, FaDollarSign, FaSortAmountDown, FaBed, FaCouch, FaGift, FaBoxOpen, FaUtensils } from "react-icons/fa";
-import { GiLargeDress, GiRunningShoe, GiWatch, GiHeartNecklace, GiTrousers } from "react-icons/gi";
+import { FaLeaf, FaTree, FaSeedling, FaMountain, FaVial, FaHandsHelping, FaDotCircle, FaSolarPanel, FaBox, FaShoppingBag, FaHeart, FaShoppingCart, FaEye, FaTimes, FaRegHeart, FaSearch, FaChevronRight, FaStar, FaStarHalfAlt, FaRegStar, FaFilter, FaSort, FaTags, FaArrowRight, FaSlidersH, FaDollarSign, FaSortAmountDown } from "react-icons/fa";
+import { GiFlowerPot, GiGardeningShears } from "react-icons/gi";
 import "./AllProductsStyles.css";
 import { db } from '../../firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
@@ -271,13 +271,17 @@ const AllProducts = () => {
 
   const categories = [
     { id: "all", name: "All Products", icon: <FaShoppingBag /> },
-    { id: "Cushion Covers", name: "Cushion Covers", icon: <FaCouch /> },
-    { id: "Bedsets", name: "Bedsets", icon: <FaBed /> },
-    { id: "Dohars & Quilts", name: "Dohars & Quilts", icon: <FaBed /> },
-    { id: "Table Linen", name: "Table Linen", icon: <FaUtensils /> },
-    { id: "Bags & Pouches", name: "Bags & Pouches", icon: <FaTshirt /> },
-    { id: "wish-genie", name: "Wish Genie", icon: <FaGift /> },
-    { id: "Gifting", name: "Hampers / Gift Boxes", icon: <FaBoxOpen /> },
+    { id: "indoor-plants", name: "Indoor Plants", icon: <FaLeaf /> },
+    { id: "outdoor-plants", name: "Outdoor Plants", icon: <FaTree /> },
+    { id: "succulents-cacti", name: "Succulents & Cacti", icon: <FaSeedling /> },
+    { id: "pots-planters", name: "Pots & Planters", icon: <GiFlowerPot /> },
+    { id: "soil-media", name: "Soil & Growing Media", icon: <FaMountain /> },
+    { id: "fertilizers", name: "Fertilizers & Plant Food", icon: <FaVial /> },
+    { id: "tools", name: "Gardening Tools", icon: <GiGardeningShears /> },
+    { id: "care-products", name: "Plant Care Products", icon: <FaHandsHelping /> },
+    { id: "seeds-saplings", name: "Seeds & Saplings", icon: <FaDotCircle /> },
+    { id: "decor", name: "Garden Decor", icon: <FaSolarPanel /> },
+    { id: "kits", name: "DIY Garden Kits", icon: <FaBox /> },
   ];
 
   const sortOptions = [
@@ -411,13 +415,15 @@ const AllProducts = () => {
 
   // Update the category click handler
   const handleCategoryClick = (category) => {
-    if (category.name === "Wish Genie") {
-      navigate('/new-arrivals-wish');
+    if (category.id === "all") {
+      setSelectedCategory("All Products");
+      navigate('/all-products');
       return;
     }
-    setSelectedCategory(category.name);
-
-    setVisibleItems(12);
+    
+    // Navigate to category page
+    const categoryPath = category.name.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
+    navigate(`/category/${categoryPath}`);
   };
 
   const toggleCategoryDropdown = () => {
@@ -540,50 +546,35 @@ const AllProducts = () => {
             <div className="products-divider"></div>
           </div>
 
-          {/* Category Indicator */}
-          <div className="category-indicator">
-            <div className="category-breadcrumb">
-              <div className="category-dropdown">
-                <button
-                  className="category-dropdown-btn"
-                  onClick={toggleCategoryDropdown}
-                >
-                  <span className="current-category">
-                    {selectedCategory === "All Products" ? "All Products" : selectedCategory}
-
-                  </span>
-                  <FaChevronRight className={`dropdown-arrow ${activeDropdown === 'category' ? 'rotated' : ''}`} />
-                </button>
-                {activeDropdown === 'category' && (
-                  <div className="category-dropdown-content">
-                    {categories.map((category) => (
-                      <button
-                        key={category.name}
-                        className={`category-dropdown-option ${selectedCategory === category.name ? "active" : ""}`}
-                        onClick={() => {
-                          handleCategoryClick(category);
-                          setActiveDropdown(null);
-                        }}
-                      >
-                        <span className="category-dropdown-icon">{category.icon}</span>
-                        <span className="category-dropdown-text">{category.name}</span>
-                        {category.name !== "Wish Genie" && category.name !== "Hampers / Gift Boxes" && (
-                          <span className="category-dropdown-count">({categoryCounts[category.id]})</span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
+          {/* Category Indicator - Removed dropdown as per request */}
+          <div className="category-indicator-hidden"></div>
 
           <div className="products-main-content">
             {/* Side Filters Panel */}
             <div className={`products-filters ${filtersVisible ? 'visible' : ''}`}>
               <div className="filters-header">
-                <h3><FaSlidersH /> Filters</h3>
+                <h3><FaSlidersH /> Explore</h3>
                 <button className="close-filters" onClick={() => setFiltersVisible(false)}>×</button>
+              </div>
+
+              {/* New Vertical Category Column */}
+              <div className="filter-group">
+                <h4><FaTags /> Categories</h4>
+                <div className="vertical-categories">
+                  {categories.map((category) => (
+                    <button
+                      key={category.id}
+                      className={`category-item-link ${selectedCategory === category.name ? "active" : ""}`}
+                      onClick={() => handleCategoryClick(category)}
+                    >
+                      <span className="category-item-icon">{category.icon}</span>
+                      <span className="category-item-text">{category.name}</span>
+                      {category.id !== "all" && (
+                        <span className="category-item-count">({categoryCounts[category.id] || 0})</span>
+                      )}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Mobile Filter Toggle */}
@@ -761,7 +752,12 @@ const AllProducts = () => {
                   if (product.image) {
                     const imagesArr = product.image.split(',').map(img => img.trim()).filter(Boolean);
                     if (imagesArr.length > 0) {
-                      firstImage = imagesArr[0].startsWith('/') ? imagesArr[0] : `/${imagesArr[0]}`;
+                      const img = imagesArr[0];
+                      if (img.startsWith('http') || img.startsWith('https') || img.startsWith('/')) {
+                        firstImage = img;
+                      } else {
+                        firstImage = `/${img}`;
+                      }
                     }
                   }
                   return (

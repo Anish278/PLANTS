@@ -11,8 +11,16 @@ const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 const Razorpay = require("razorpay");
 const crypto = require("crypto");
+const cloudinary = require("cloudinary").v2;
 
 admin.initializeApp();
+
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 // Get Razorpay credentials from Firebase config
 const razorpayConfig = functions.config().razorpay || {};

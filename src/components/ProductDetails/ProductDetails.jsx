@@ -31,7 +31,7 @@ import "./ProductDetails.css";
 import { useAuth } from '../../context/AuthContext';
 import LoginPrompt from '../LoginPrompt/LoginPrompt';
 import { db } from "../../firebase/config";
-import { collection, getDocs, query, where, orderBy, limit } from "firebase/firestore";
+import { collection, getDocs, query, where, orderBy, limit, onSnapshot, doc, getDoc } from "firebase/firestore";
 import { auth } from '../../firebase/config';
 import { incrementProductViews, initializeProductFields, incrementProductBought } from '../../firebase/firestore';
 import OptimizedImage from '../../Component/OptimizedImage';
@@ -155,21 +155,42 @@ const ProductDetails = () => {
         setLoading(true);
         console.log('Fetching product with ID:', id); // Debug log
 
-        // Fetch product from Firestore using numeric ID
+        // Fetch product from Firestore
         const productsRef = collection(db, 'products');
-        const q = query(productsRef, where('id', '==', parseInt(id)));
-        const querySnapshot = await getDocs(q);
+        let productDoc = null;
+        let raw = null;
 
-        if (querySnapshot.empty) {
+        // Try to fetch by numeric ID first
+        if (!isNaN(parseInt(id))) {
+          const q = query(productsRef, where('id', '==', parseInt(id)));
+          const querySnapshot = await getDocs(q);
+          if (!querySnapshot.empty) {
+            productDoc = querySnapshot.docs[0];
+            raw = productDoc.data();
+          }
+        }
+
+        // If not found by numeric ID, try by document ID
+        if (!productDoc) {
+          try {
+            const docRef = doc(db, 'products', id);
+            const docSnap = await getDoc(docRef);
+            if (docSnap.exists()) {
+              productDoc = docSnap;
+              raw = productDoc.data();
+            }
+          } catch (e) {
+            console.log('Error fetching by document ID:', e);
+          }
+        }
+
+        if (!productDoc) {
           console.log('Product not found in Firestore'); // Debug log
           setError('Product not found');
           setLoading(false);
           return;
         }
 
-        // Get the first matching document
-        const productDoc = querySnapshot.docs[0];
-        const raw = productDoc.data();
         console.log('Raw product data:', raw); // Debug log
 
         const normalized = {
@@ -325,7 +346,12 @@ const ProductDetails = () => {
         .split(',')
         .map(img => img.trim())
         .filter(Boolean)
-        .map(img => img.startsWith('/') ? img : `/${img}`); // Ensure leading slash for public folder
+        .map(img => {
+          if (img.startsWith('http') || img.startsWith('https') || img.startsWith('/')) {
+            return img;
+          }
+          return `/${img}`;
+        });
       setProductImages(imagesArr.length > 0 ? imagesArr : ['/placeholder-image.webp']);
     } else {
       setProductImages(['/placeholder-image.webp']);

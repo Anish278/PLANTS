@@ -316,12 +316,15 @@ const NewArrivalsWish = () => {
       });
   };
 
-  // Helper to get the first image from the comma-separated image field
   const getFirstImage = (imageField) => {
     if (!imageField) return '/placeholder-image.webp';
     const imagesArr = imageField.split(',').map(img => img.trim()).filter(Boolean);
     if (imagesArr.length > 0) {
-      return imagesArr[0].startsWith('/') ? imagesArr[0] : `/${imagesArr[0]}`;
+      const img = imagesArr[0];
+      if (img.startsWith('http') || img.startsWith('https') || img.startsWith('/')) {
+        return img;
+      }
+      return `/${img}`;
     }
     return '/placeholder-image.webp';
   };
@@ -387,7 +390,7 @@ const NewArrivalsWish = () => {
             <p className="wish-dimensions">Diameter: {product.Diameter}</p>
             <p className="wish-jar-type">Jar Type: {product['Jar type']}</p>
           </div>
-          <button className="wish-shop-now-btn" onClick={e => { e.stopPropagation(); navigate(`/product/${product.id}`); }}>
+          <button className="wish-shop-now-btn" onClick={e => { e.stopPropagation(); navigate(`/product-wish/${product.id}`); }}>
             Shop Now
           </button>
         </div>

@@ -209,50 +209,33 @@ const CategoryProducts = () => {
 
   // Updated product categories
   const categories = {
-    "luxury-watches": {
-      name: "Luxury Watches",
-      subcategories: ["analog", "digital", "smart-watches"],
-    },
-    "womens-fashion": {
-      name: "Women's Fashion",
-      subcategories: ["dresses", "casual-wear", "evening-gowns"],
-    },
-    accessories: {
-      name: "Accessories",
-      subcategories: ["bags", "jewelry"],
-    },
-    footwear: {
-      name: "Footwear",
-      subcategories: ["heels", "sneakers", "boots"],
-    },
+    "indoor-plants": { name: "Indoor Plants" },
+    "outdoor-plants": { name: "Outdoor Plants" },
+    "succulents-cacti": { name: "Succulents & Cacti" },
+    "pots-planters": { name: "Pots & Planters" },
+    "soil-media": { name: "Soil & Growing Media" },
+    "fertilizers": { name: "Fertilizers & Plant Food" },
+    "tools": { name: "Gardening Tools" },
+    "care-products": { name: "Plant Care Products" },
+    "seeds-saplings": { name: "Seeds & Saplings" },
+    "decor": { name: "Garden Decor" },
+    "kits": { name: "DIY Garden Kits" },
   };
 
   // Format category name for display (SEO updated)
   const formatCategoryName = (name) => {
-    const formattedName = name
+    if (!name) return "Products";
+    
+    // Check if it exists in our categories map
+    if (categories[name.toLowerCase()]) {
+      return categories[name.toLowerCase()].name;
+    }
+
+    // Default formatting
+    return name
       .split("-")
       .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
       .join(" ");
-      
-    const lowerName = name.toLowerCase();
-    
-    if (lowerName === "bedding" || lowerName === "bedsets") {
-      return "Premium Bedroom Decor Accessories & Bedding Sets";
-    }
-    if (lowerName === "cushions" || lowerName === "cushion" || lowerName === "cushion-covers") {
-      return "Living Room Decor Items: Designer Cushion Covers";
-    }
-    if (lowerName === "hampers" || lowerName === "gift-boxes" || lowerName === "gift boxes" || lowerName === "gifting") {
-      return "Handcrafted Home Decor Items & Scented Candles For Home Décor";
-    }
-    if (lowerName === "blue-dreams" || lowerName === "blue dreams" || lowerName === "the-scallop-story" || lowerName === "the scallop story") {
-      return `Modern Home Decor Accessories: ${formattedName}`;
-    }
-    if (lowerName === "all" || lowerName === "all-products") {
-      return "All Products";
-    }
-    
-    return `Modern Home Decor Accessories: ${formattedName}`;
   };
 
   // Helper function to calculate discounted price
