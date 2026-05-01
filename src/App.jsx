@@ -3,6 +3,10 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { CartProvider } from './context/CartContext.jsx';
 import { WishlistProvider } from './context/WishlistContext.jsx';
 import { AuthProvider, useAuth } from './context/AuthContext.jsx';
+import { ProductProvider } from './context/ProductContext.jsx';
+import { FilterProvider } from './context/FilterContext.jsx';
+import MainLayout from './components/MainLayout/MainLayout.jsx';
+
 import Homepage from './Component/Homepage.jsx';
 import NewArrivals from './components/NewArrivals/NewArrivals.jsx';
 import AllProducts from './components/AllProducts/AllProducts.jsx';
@@ -12,12 +16,9 @@ import ProductDetails from './components/ProductDetails/ProductDetails.jsx';
 import Cart from './components/Cart/Cart.jsx';
 import Wishlist from './components/Wishlist/Wishlist.jsx';
 import CategoryProducts from './components/CategoryProducts/CategoryProducts.jsx';
-import Navbar from './Component/Navbar/Navbar.jsx';
 import Login from './components/Login/Login.jsx';
 import Signup from './components/Login/Signup.jsx';
 import About from './components/Aboutpage/About.jsx';
-import './App.css';
-import Footer from './Component/Footer/Footer.jsx';
 import Profile from './Component/Profile/Profile.jsx';
 import MyOrders from './Component/Orders/MyOrders';
 import Settings from './Component/Settings/Settings';
@@ -30,8 +31,6 @@ import ScrollToTop from './components/ScrollToTop';
 import TermsAndConditions from './components/Login/TermsAndConditions';
 import PrivacyPolicy from './components/Login/PrivacyPolicy';
 import OrderTracking from './pages/OrderTracking.jsx';
-import CookieConsent from './components/CookieConsent/CookieConsent.jsx';
-
 import AdminDashboard from './components/Admin/AdminDashboard.jsx';
 import DashboardOverview from './components/Admin/DashboardOverview.jsx';
 import Orders from './components/Admin/Orders.jsx';
@@ -52,53 +51,19 @@ import CartManagement from './components/Admin/CartManagement';
 import WishlistManagement from './components/Admin/WishlistManagement.jsx';
 import TestimonialsManagement from './components/Admin/TestimonialsManagement.jsx';
 import BlogDetail from './components/Blog/BlogDetail.jsx';
+import './App.css';
 
-
-// Layout component with navbar and footer
-const PageLayout = ({ children }) => {
-  return (
-    <div>
-      <Navbar />
-      {children}
-      <Footer />
-      <CookieConsent />
-    </div>
-  );
-};
-
-// Protected Route component for features that require login
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
-
-  if (loading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  return <PageLayout>{children}</PageLayout>;
+  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  return <MainLayout>{children}</MainLayout>;
 };
 
-// Admin Route component for admin-only features
 const AdminRoute = ({ children }) => {
-  const { isAuthenticated, user, loading } = useAuth();
-
-  if (loading) {
-    return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>;
-  }
-
-  if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // TEMPORARY BYPASS: allow any logged in user to see the admin pages
-  // In production, uncomment the lines below to restrict access!
-  // if (!user?.isAdmin) {
-  //   return <Navigate to="/" replace />;
-  // }
-
+  const { isAuthenticated, loading } = useAuth();
+  if (loading) return <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>Loading...</div>;
+  if (!isAuthenticated) return <Navigate to="/login" replace />;
   return children;
 };
 
@@ -106,73 +71,63 @@ function App() {
   return (
     <GoogleOAuthProvider clientId="727732829380-un80uanpnh4rra3sfjr59a48et2rph38.apps.googleusercontent.com">
       <AuthProvider>
-        <CartProvider>
-          <WishlistProvider>
-            <Router>
-              <ScrollToTop />
-              <Routes>
-                {/* Public Routes */}
-                <Route path="/" element={<PageLayout><Homepage /></PageLayout>} />
-                <Route path="/new-arrivals" element={<PageLayout><NewArrivals /></PageLayout>} />
-                <Route path="/all-products" element={<PageLayout><AllProducts /></PageLayout>} />
-                <Route path="/featured-stories" element={<PageLayout><FeaturedStories /></PageLayout>} />
-                <Route path="/contact" element={<PageLayout><Contact /></PageLayout>} />
-                <Route path="/about" element={<PageLayout><About /></PageLayout>} />
-                <Route path="/product/:id" element={<PageLayout><ProductDetails /></PageLayout>} />
-                <Route path="/blog/:id" element={<PageLayout><BlogDetail /></PageLayout>} />
-                <Route path="/category/:categoryName" element={<PageLayout><CategoryProducts /></PageLayout>} />
-                <Route path="/terms" element={<PageLayout><TermsAndConditions /></PageLayout>} />
-                <Route path="/privacy-policy" element={<PageLayout><PrivacyPolicy /></PageLayout>} />
-                <Route path="/track-order" element={<PageLayout><OrderTracking /></PageLayout>} />
-                <Route path="/new-arrivals-wish" element={<PageLayout><NewArrivalsWish /></PageLayout>} />
-                <Route path="/returns-exchange" element={<PageLayout><ReturnsExchange /></PageLayout>} />
-
-                {/* Auth Routes */}
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-
-                {/* Payment Status Routes */}
-                <Route path="/payment-success" element={<PaymentSuccess />} />
-                <Route path="/payment-failed" element={<PaymentFailed />} />
-
-                {/* Protected Routes - Require Login */}
-                <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
-                <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
-                <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
-                <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
-                <Route path="/orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
-                <Route path="/addresses" element={<ProtectedRoute><AddressManagement /></ProtectedRoute>} />
-                <Route path="/saved-cart" element={<ProtectedRoute><SavedCart /></ProtectedRoute>} />
-                <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
-                <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
-                <Route path="/change-password" element={<PageLayout><ChangePassword /></PageLayout>} />
-                <Route path="/forgot-password" element={<ForgotPassword />} />
-
-                {/* Admin Routes */}
-                <Route path="/admin" element={
-                  <AdminRoute>
-                    <AdminDashboard />
-                  </AdminRoute>
-                }>
-                  <Route index element={<DashboardOverview />} />
-                  <Route path="orders" element={<Orders />} />
-                  <Route path="delivery-management" element={<OrderDeliveryManagement />} />
-                  <Route path="analytics" element={<Analytics />} />
-                  <Route path="notifications" element={<NotificationsAdmin />} />
-                  <Route path="users" element={<Users />} />
-                  <Route path="categories" element={<Categories />} />
-                  <Route path="products" element={<Products />} />
-                  <Route path="wish-genie" element={<WishGenieProducts />} />
-                  <Route path="cart-management" element={<CartManagement />} />
-                  <Route path="wishlist-management" element={<WishlistManagement />} />
-                  <Route path="testimonials" element={<TestimonialsManagement />} />
-                </Route>
-
-                <Route path="/product-wish/:id" element={<PageLayout><ProductDetailWish /></PageLayout>} />
-              </Routes>
-            </Router>
-          </WishlistProvider>
-        </CartProvider>
+        <ProductProvider>
+          <FilterProvider>
+            <CartProvider>
+              <WishlistProvider>
+                <Router>
+                  <ScrollToTop />
+                  <Routes>
+                    <Route path="/" element={<MainLayout><Homepage /></MainLayout>} />
+                    <Route path="/new-arrivals" element={<MainLayout><NewArrivals /></MainLayout>} />
+                    <Route path="/all-products" element={<MainLayout><AllProducts /></MainLayout>} />
+                    <Route path="/featured-stories" element={<MainLayout><FeaturedStories /></MainLayout>} />
+                    <Route path="/contact" element={<MainLayout><Contact /></MainLayout>} />
+                    <Route path="/about" element={<MainLayout><About /></MainLayout>} />
+                    <Route path="/product/:id" element={<MainLayout><ProductDetails /></MainLayout>} />
+                    <Route path="/blog/:id" element={<MainLayout><BlogDetail /></MainLayout>} />
+                    <Route path="/category/:categoryName" element={<MainLayout><CategoryProducts /></MainLayout>} />
+                    <Route path="/terms" element={<MainLayout><TermsAndConditions /></MainLayout>} />
+                    <Route path="/privacy-policy" element={<MainLayout><PrivacyPolicy /></MainLayout>} />
+                    <Route path="/track-order" element={<MainLayout><OrderTracking /></MainLayout>} />
+                    <Route path="/new-arrivals-wish" element={<MainLayout><NewArrivalsWish /></MainLayout>} />
+                    <Route path="/returns-exchange" element={<MainLayout><ReturnsExchange /></MainLayout>} />
+                    <Route path="/login" element={<Login />} />
+                    <Route path="/signup" element={<Signup />} />
+                    <Route path="/forgot-password" element={<ForgotPassword />} />
+                    <Route path="/payment-success" element={<PaymentSuccess />} />
+                    <Route path="/payment-failed" element={<PaymentFailed />} />
+                    <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+                    <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
+                    <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
+                    <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+                    <Route path="/orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
+                    <Route path="/addresses" element={<ProtectedRoute><AddressManagement /></ProtectedRoute>} />
+                    <Route path="/saved-cart" element={<ProtectedRoute><SavedCart /></ProtectedRoute>} />
+                    <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+                    <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
+                    <Route path="/change-password" element={<MainLayout><ChangePassword /></MainLayout>} />
+                    <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>}>
+                      <Route index element={<DashboardOverview />} />
+                      <Route path="orders" element={<Orders />} />
+                      <Route path="delivery-management" element={<OrderDeliveryManagement />} />
+                      <Route path="analytics" element={<Analytics />} />
+                      <Route path="notifications" element={<NotificationsAdmin />} />
+                      <Route path="users" element={<Users />} />
+                      <Route path="categories" element={<Categories />} />
+                      <Route path="products" element={<Products />} />
+                      <Route path="wish-genie" element={<WishGenieProducts />} />
+                      <Route path="cart-management" element={<CartManagement />} />
+                      <Route path="wishlist-management" element={<WishlistManagement />} />
+                      <Route path="testimonials" element={<TestimonialsManagement />} />
+                    </Route>
+                    <Route path="/product-wish/:id" element={<MainLayout><ProductDetailWish /></MainLayout>} />
+                  </Routes>
+                </Router>
+              </WishlistProvider>
+            </CartProvider>
+          </FilterProvider>
+        </ProductProvider>
       </AuthProvider>
     </GoogleOAuthProvider>
   );

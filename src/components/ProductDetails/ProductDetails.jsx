@@ -1,6 +1,5 @@
 
 
-
 import React, { useState, useRef, useEffect } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import { useBackNavigation } from "../../utils/navigationUtils.js";
@@ -24,7 +23,16 @@ import {
   FaShoppingBag,
   FaArrowRight,
   FaRegHeart,
+  FaCheckCircle,
 } from "react-icons/fa";
+import {
+  IoWaterOutline,
+  IoSunnyOutline,
+  IoPawOutline,
+  IoLeafOutline,
+  IoShieldCheckmarkOutline,
+  IoArrowBackOutline,
+} from "react-icons/io5";
 import { useCart } from "../../context/CartContext.jsx";
 import { useWishlist } from "../../context/WishlistContext.jsx";
 import "./ProductDetails.css";
@@ -56,13 +64,11 @@ const formatPrice = (price) => {
   return `₹${numPrice.toFixed(2)}`;
 };
 
-// Helper function to calculate discounted price
 const calculateDiscountedPrice = (originalPrice, discountPercentage) => {
   if (!discountPercentage || discountPercentage <= 0) return originalPrice;
   return originalPrice * (1 - discountPercentage / 100);
 };
 
-// Helper function to format price with discount
 const formatPriceWithDiscount = (price, discount) => {
   const originalPrice = Number(price) || 0;
   const discountPercentage = Number(discount) || 0;
@@ -91,7 +97,7 @@ const ProductDetails = () => {
   const { addToCart } = useCart();
   const { addToWishlist, isInWishlist, removeFromWishlist } = useWishlist();
   const { isAuthenticated } = useAuth();
-  const [selectedSize, setSelectedSize] = useState("");
+  const [selectedSize, setSelectedSize] = useState("Small");
   const [quantity, setQuantity] = useState(1);
   const [activeTab, setActiveTab] = useState("description");
   const [selectedImage, setSelectedImage] = useState(0);
@@ -105,20 +111,12 @@ const ProductDetails = () => {
   const [error, setError] = useState(null);
   const [currentPrice, setCurrentPrice] = useState(0);
   const [relatedProducts, setRelatedProducts] = useState([]);
-  const [availableColors] = useState([
-    { name: "Black", code: "#000000", available: true },
-    { name: "White", code: "#FFFFFF", available: true },
-    { name: "Red", code: "#FF0000", available: true },
-    { name: "Blue", code: "#0000FF", available: true },
-    { name: "Green", code: "#008000", available: false },
-    { name: "Yellow", code: "#FFFF00", available: true },
-    { name: "Purple", code: "#800080", available: true }
-  ]);
   const [pincode, setPincode] = useState('');
   const [deliveryDate, setDeliveryDate] = useState(null);
   const [pincodeError, setPincodeError] = useState('');
   const galleryRef = useRef(null);
   const wrapperRef = useRef(null);
+  const thumbnailContainerRef = useRef(null);
   const [showLoginPrompt, setShowLoginPrompt] = useState(false);
   const [recentlyViewedProducts, setRecentlyViewedProducts] = useState([]);
   const [trendingProducts, setTrendingProducts] = useState([]);
@@ -153,14 +151,10 @@ const ProductDetails = () => {
     const fetchProduct = async () => {
       try {
         setLoading(true);
-        console.log('Fetching product with ID:', id); // Debug log
-
-        // Fetch product from Firestore
         const productsRef = collection(db, 'products');
         let productDoc = null;
         let raw = null;
 
-        // Try to fetch by numeric ID first
         if (!isNaN(parseInt(id))) {
           const q = query(productsRef, where('id', '==', parseInt(id)));
           const querySnapshot = await getDocs(q);
@@ -170,7 +164,6 @@ const ProductDetails = () => {
           }
         }
 
-        // If not found by numeric ID, try by document ID
         if (!productDoc) {
           try {
             const docRef = doc(db, 'products', id);
@@ -185,21 +178,15 @@ const ProductDetails = () => {
         }
 
         if (!productDoc) {
-          console.log('Product not found in Firestore'); // Debug log
           setError('Product not found');
           setLoading(false);
           return;
         }
 
-        console.log('Raw product data:', raw); // Debug log
-
         const normalized = {
           ...raw,
           id: productDoc.id,
           image: raw.image || '/placeholder-image.webp',
-          image2: raw.image2 || '/placeholder-image.webp',
-          image3: raw.image3 || '/placeholder-image.webp',
-          image4: raw.image4 || '/placeholder-image.webp',
           reviews: raw.reviews || [],
           reviewsCount: raw.reviewsCount || 0,
           discount: raw.discount || 0,
@@ -207,38 +194,20 @@ const ProductDetails = () => {
           sizes: raw.sizes || [],
           rating: raw.rating || 4.5,
           mrp: Number(raw.mrp) || 0,
-          cost_price: Number(raw.cost_price) || 0,
-          color: raw.color || 'N/A',
-          product_description: raw.product_description || '',
-          product_details: raw.product_details || '',
-          material: raw.material || '',
-          dimension: raw.dimension || '',
-          care_instructions: raw.care_instructions || '',
           inventory: raw.inventory || 0,
           product_name: raw.product_name || '',
-          product_code: raw.product_code || '',
           category: raw.category || '',
-          variantPrices: raw.variantPrices || {},
         };
-        console.log('Normalized product data:', normalized); // Debug log
-        console.log('Product inventory value:', normalized.inventory); // Debug inventory
-        console.log('Inventory type:', typeof normalized.inventory); // Debug inventory type
-        console.log('Product discount value:', normalized.discount); // Debug discount
-        console.log('Product MRP value:', normalized.mrp); // Debug MRP
-        console.log('Price info for display:', formatPriceWithDiscount(normalized.mrp, normalized.discount)); // Debug price display
         setProduct(normalized);
         setCurrentPrice(Number(normalized.mrp) || 0);
 
-        // Initialize engagement fields and increment view count for this product
         try {
           await initializeProductFields(id);
           await incrementProductViews(id);
-          console.log('Successfully initialized and incremented views for product:', id);
         } catch (error) {
           console.error('Error handling product engagement:', error);
         }
 
-        // Fetch related products from Firestore
         const relatedQuery = query(
           productsRef,
           where('category', '==', raw.category)
@@ -263,84 +232,6 @@ const ProductDetails = () => {
   }, [id]);
 
   useEffect(() => {
-    // Real-time listener for product engagement updates
-    if (!id) return;
-
-    const productsRef = collection(db, 'products');
-    const q = query(productsRef, where('id', '==', parseInt(id)));
-
-    const unsubscribe = onSnapshot(q, (querySnapshot) => {
-      if (!querySnapshot.empty) {
-        const updatedData = querySnapshot.docs[0].data();
-        console.log('Real-time engagement update received:', updatedData);
-
-        setProduct(prevProduct => {
-          if (prevProduct) {
-            return { ...prevProduct, ...updatedData };
-          }
-          return updatedData;
-        });
-      }
-    }, (error) => {
-      console.error('Error in real-time listener:', error);
-    });
-
-    // Cleanup subscription on unmount
-    return () => unsubscribe();
-  }, [id]);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      // Disable sticky scroll on smaller screens where layout stacks vertically (overlapping issue)
-      if (window.innerWidth <= 1200) {
-        if (galleryRef.current) {
-          galleryRef.current.style.transform = 'translateY(0)';
-        }
-        return;
-      }
-
-      if (galleryRef.current && wrapperRef.current) {
-        const wrapperRect = wrapperRef.current.getBoundingClientRect();
-        const galleryRect = galleryRef.current.getBoundingClientRect();
-
-        if (wrapperRect.top <= 0 && wrapperRect.bottom >= galleryRect.height) {
-          const translateY = -wrapperRect.top;
-          galleryRef.current.style.transform = `translateY(${translateY}px)`;
-        } else if (wrapperRect.top > 0) {
-          galleryRef.current.style.transform = 'translateY(0)';
-        }
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('resize', handleScroll);
-    return () => {
-      window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('resize', handleScroll);
-    };
-  }, []);
-
-  useEffect(() => {
-    const fetchAllProducts = async () => {
-      const products = await getAllProducts();
-      // Filter out current product and get recently viewed
-      const filteredProducts = products.filter(p => p.id !== product?.id);
-      setRecentlyViewedProducts(filteredProducts.slice(0, 4));
-
-      // Get trending products (sorted by rating)
-      const trending = [...filteredProducts]
-        .sort((a, b) => (b.rating || 0) - (a.rating || 0))
-        .slice(0, 4);
-      setTrendingProducts(trending);
-    };
-
-    if (product) {
-      fetchAllProducts();
-    }
-  }, [product]);
-
-  useEffect(() => {
-    // If product and product.image exist, split by comma and trim
     if (product && product.image) {
       const imagesArr = product.image
         .split(',')
@@ -358,352 +249,70 @@ const ProductDetails = () => {
     }
   }, [product]);
 
-  useEffect(() => {
-    if (showLoginPrompt) {
-      document.body.classList.add('login-prompt-active');
-    } else {
-      document.body.classList.remove('login-prompt-active');
-    }
-
-    return () => {
-      document.body.classList.remove('login-prompt-active');
-    };
-  }, [showLoginPrompt]);
-
-  if (loading) {
-    return <div className="loading">Loading...</div>;
-  }
-
-  if (error) {
-    return (
-      <div className="error-container">
-        <h2>Error</h2>
-        <p>{error}</p>
-        <button onClick={() => goBack()} className="back-button">
-          ← Back to Products
-        </button>
-      </div>
-    );
-  }
-
-  if (!product) {
-    return (
-      <div className="product-not-found">
-        <h2>Product not found</h2>
-        <button onClick={() => goBack()} className="back-button">
-          ← Back to Products
-        </button>
-      </div>
-    );
-  }
-
-  const handleColorSelect = (color) => {
-    if (!color.available) {
-      setColorError("This color is currently not available. Please select another color.");
-      setSelectedColor("");
-      return;
-    }
-    setSelectedColor(color.code);
-    setColorError("");
-  };
-
-  const handleSizeSelect = (size) => {
-    if (!product.sizes.includes(size)) {
-      setSizeError("This size is currently not available. Please select another size.");
-      setSelectedSize("");
-      return;
-    }
-    setSelectedSize(size);
-    setSizeError("");
-
-    // Update price based on selected size variant
-    if (product.variantPrices && product.variantPrices[size]) {
-      setCurrentPrice(Number(product.variantPrices[size]));
-    } else {
-      setCurrentPrice(Number(product.mrp));
-    }
-  };
-
-  const handleAddToCart = async (e) => {
-    console.log('Add to cart button clicked');
-    e.preventDefault();
-    e.stopPropagation();
-
-    // First check if user is authenticated
+  const handleAddToCart = async () => {
     if (!isAuthenticated) {
-      console.log('User not authenticated, showing login prompt');
       setShowLoginPrompt(true);
       return;
     }
 
-    // Get current user details
-    const user = auth.currentUser;
-    if (!user) {
-      console.log('No user found, showing login prompt');
-      setShowLoginPrompt(true);
-      return;
-    }
-
-    // Log user details for debugging
-    console.log('Current user:', {
-      email: user.email,
-      uid: user.uid
-    });
-
-    // Log product data for debugging
-    console.log('Product data:', {
-      id: product.id,
-      name: product.product_name,
-      price: product.mrp,
-      currentPrice: currentPrice
-    });
-
-    // Create the product object to add to cart with all necessary fields
     const productToAdd = {
       id: product.id,
       name: product.product_name,
-      price: currentPrice, // Use the dynamically updated price
+      price: currentPrice,
       discount: product.discount || 0,
       image: product.image || '/placeholder-image.webp',
       category: product.category,
-      size: selectedSize || 'Standard',
+      size: selectedSize,
       quantity: quantity,
-      color: product.color || 'Default',
-      product_code: product.product_code,
       selected: true,
       addedAt: new Date().toISOString()
     };
 
-    console.log('Adding to cart:', {
-      product: productToAdd,
-      size: selectedSize || 'Standard',
-      quantity: quantity,
-      userEmail: user.email
-    });
-
     try {
-      // Add to cart - pass the navigate function
-      await addToCart(productToAdd, selectedSize || 'Standard', quantity, navigate);
-
-      // Increment bought count when product is added to cart
-      try {
-        await incrementProductBought(id);
-        console.log('Successfully incremented bought count for product:', id);
-      } catch (error) {
-        console.error('Error incrementing product bought count:', error);
-      }
-
-      // Show success message
-      setShowSuccessMessage(true);
-      setTimeout(() => setShowSuccessMessage(false), 3000);
-
-      // Emit a custom event that can be listened for in other components
-      const cartUpdateEvent = new CustomEvent('cartUpdated', {
-        detail: { item: productToAdd, action: 'add' }
-      });
-      window.dispatchEvent(cartUpdateEvent);
-
-      // Navigate to cart page after successful addition
+      await addToCart(productToAdd, selectedSize, quantity, navigate);
+      await incrementProductBought(id);
       navigate('/cart');
     } catch (error) {
       console.error('Error adding product to cart:', error);
-      alert('Failed to add product to cart. Please try again.');
     }
   };
 
-  const handleAddToWishlist = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
-
+  const handleAddToWishlist = () => {
     if (!isAuthenticated) {
       setShowLoginPrompt(true);
       return;
     }
-
-    // Check if product is already in wishlist
     if (isInWishlist(product.id)) {
-      // If already in wishlist, remove it
-      console.log('[ProductDetails] Removing from wishlist:', product);
       removeFromWishlist(product.id);
     } else {
-      // If not in wishlist, add it
-      console.log('[ProductDetails] Adding to wishlist:', product);
       addToWishlist(product);
     }
   };
 
-  const handleQuickView = (productId, e) => {
-    e.stopPropagation();
-    navigate(`/product/${productId}`);
-  };
-
-  const handleRelatedProductAction = async (e, action, product) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!isAuthenticated) {
-      setShowLoginPrompt(true);
-      return;
-    }
-
-    try {
-      if (action === 'cart') {
-        // Format the product data consistently for Cart and SavedCart
-        const productToAdd = {
-          id: product.id,
-          name: product.product_name || product.name,
-          price: product.mrp || product.price,
-          discount: product.discount || 0,
-          image: product.image || '/placeholder-image.webp',
-          category: product.category || '',
-          size: product.size || 'Standard',
-          quantity: 1,
-          color: product.color || 'Default',
-          product_code: product.product_code || '',
-          selected: true,
-          addedAt: new Date().toISOString()
-        };
-
-        // Add to cart
-        await addToCart(productToAdd, productToAdd.size, 1, navigate);
-
-        // Increment bought count when related product is added to cart
-        try {
-          await incrementProductBought(product.id);
-          console.log('Successfully incremented bought count for related product:', product.id);
-        } catch (error) {
-          console.error('Error incrementing related product bought count:', error);
-        }
-
-        // Show a brief success message
-        alert('Product added to cart!');
-
-        // Emit cart update event
-        const cartUpdateEvent = new CustomEvent('cartUpdated', {
-          detail: { item: productToAdd, action: 'add' }
-        });
-        window.dispatchEvent(cartUpdateEvent);
-      } else if (action === 'wishlist') {
-        handleAddToWishlist(e);
-      }
-    } catch (error) {
-      console.error(`Error performing ${action} action:`, error);
-    }
-  };
-
   const handlePincodeCheck = () => {
-    // Basic validation for Indian pincode (6 digits)
     if (!/^\d{6}$/.test(pincode)) {
       setPincodeError('Please enter a valid 6-digit pincode');
       setDeliveryDate(null);
       return;
     }
-
     setPincodeError('');
-    // Simulate delivery date calculation (usually 3-7 days)
     const today = new Date();
-    const deliveryDays = Math.floor(Math.random() * 5) + 3; // Random between 3-7 days
     const delivery = new Date(today);
-    delivery.setDate(today.getDate() + deliveryDays);
-
-    // Format date as "Day, DD Month YYYY"
-    const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+    delivery.setDate(today.getDate() + 5);
+    const options = { weekday: 'long', day: 'numeric', month: 'long' };
     setDeliveryDate(delivery.toLocaleDateString('en-IN', options));
   };
 
   const renderStars = (rating) => {
     const stars = [];
-    const fullStars = Math.floor(rating);
-    const hasHalfStar = rating % 1 !== 0;
-
-    for (let i = 0; i < fullStars; i++) {
-      stars.push(<FaStar key={i} className="star filled" />);
-    }
-    if (hasHalfStar) {
-      stars.push(<FaStarHalf key="half" className="star half" />);
-    }
-    const emptyStars = 5 - stars.length;
-    for (let i = 0; i < emptyStars; i++) {
-      stars.push(<FaStar key={`empty-${i}`} className="star" />);
+    for (let i = 0; i < 5; i++) {
+      stars.push(<FaStar key={i} className={`star ${i < Math.floor(rating) ? 'filled' : ''}`} />);
     }
     return stars;
   };
 
-  // Helper to check if URL is a video
-  const isVideo = (url) => {
-    return /\.(mp4|webm|ogg|mov)$/i.test(url);
-  };
-
-  const ProductGallery = ({ images }) => {
-    return (
-      <div className="product-gallery">
-        <div className="thumbnail-column">
-          {images.map((img, index) => (
-            <div
-              key={index}
-              className={`thumbnail ${selectedImage === index ? "active" : ""}`}
-              onClick={() => setSelectedImage(index)}
-            >
-              {isVideo(img) ? (
-                <video
-                  src={img}
-                  className="thumbnail-video"
-                  muted
-                  autoPlay
-                  loop
-                  playsInline
-                  style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                />
-              ) : (
-                <img src={img} alt={`Product thumbnail ${index + 1}`} />
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="main-image-container">
-          {isVideo(images[selectedImage]) ? (
-            <video
-              src={images[selectedImage]}
-              className="main-image"
-              autoPlay
-              muted
-              loop
-              playsInline
-              controls
-              key={images[selectedImage]} // Force re-render when video changes
-            />
-          ) : (
-            <img
-              src={images[selectedImage]}
-              alt="Selected product"
-              className="main-image"
-            />
-          )}
-        </div>
-      </div>
-    );
-  };
-
-  const getSizeWidth = (size) => {
-    if (size === "Standard") return "180";
-    if (size === "4-5Y") return "45";
-    if (size === "6-7Y") return "50";
-    if (size === "40") return "50";
-    if (size === "42") return "52";
-    return "N/A";
-  };
-
-  const getSizeLength = (size) => {
-    if (size === "Standard") return "240";
-    if (size === "4-5Y") return "65";
-    if (size === "6-7Y") return "70";
-    if (size === "40") return "70";
-    if (size === "42") return "72";
-    return "N/A";
-  };
-
-
+  if (loading) return <div className="loading">Loading...</div>;
+  if (!product) return <div className="error">Product not found</div>;
 
   return (
     <div className="product-details-container">
@@ -715,682 +324,158 @@ const ProductDetails = () => {
         </div>
       )}
 
-      <div className="product-details-wrapper" ref={wrapperRef}>
-        <div className="product-gallery" ref={galleryRef}>
-          <ProductGallery images={productImages} />
+      <div className="product-details-wrapper">
+        <div className="product-gallery">
+          <div className="main-image-container">
+            <img src={productImages[selectedImage]} alt={product.product_name} className="main-image" />
+          </div>
+          <div className="thumbnail-slider">
+            {productImages.length > 3 && (
+              <button
+                className="thumb-arrow thumb-arrow-left"
+                onClick={() => {
+                  if (thumbnailContainerRef.current) {
+                    thumbnailContainerRef.current.scrollBy({ left: -90, behavior: 'smooth' });
+                  }
+                }}
+              >
+                ‹
+              </button>
+            )}
+            <div className="thumbnail-row" ref={thumbnailContainerRef}>
+              {productImages.map((img, index) => (
+                <div
+                  key={index}
+                  className={`thumbnail ${selectedImage === index ? "active" : ""}`}
+                  onClick={() => setSelectedImage(index)}
+                >
+                  <img src={img} alt={`View ${index + 1}`} />
+                </div>
+              ))}
+            </div>
+            {productImages.length > 3 && (
+              <button
+                className="thumb-arrow thumb-arrow-right"
+                onClick={() => {
+                  if (thumbnailContainerRef.current) {
+                    thumbnailContainerRef.current.scrollBy({ left: 90, behavior: 'smooth' });
+                  }
+                }}
+              >
+                ›
+              </button>
+            )}
+          </div>
         </div>
 
         <div className="product-info">
-          <nav className="breadcrumb">
-            <Link to="/">Home</Link> /<Link to="/all-products">Products</Link> /
-            <Link to={`/all-products?category=${product.category}`}>
-              {product.category}
-            </Link>
-          </nav>
-
-          <h1 className="product-title">{product.product_name}</h1>
-
-          <div className="product-meta">
-            <div className="product-price">
-              <span className="current-price" style={{ fontSize: '18px' }}>
-                {(() => {
-                  const priceInfo = formatPriceWithDiscount(currentPrice, product.discount);
-                  return (
-                    <>
-                      {priceInfo.original ? (
-                        <>
-                          <span style={{ textDecoration: 'line-through', color: '#999', marginRight: '10px' }}>
-                            ₹{priceInfo.original}
-                          </span>
-                          <span style={{ color: '#e74c3c', fontWeight: 'bold' }}>
-                            ₹{priceInfo.discounted}
-                          </span>
-                          <span style={{ background: '#e74c3c', color: 'white', padding: '2px 6px', borderRadius: '3px', fontSize: '12px', marginLeft: '8px' }}>
-                            -{priceInfo.discountPercentage}%
-                          </span>
-                        </>
-                      ) : (
-                        <span>₹{priceInfo.discounted}</span>
-                      )}
-                      <span className="stock-status">
-                        {product.inventory !== undefined && product.inventory !== null ? (
-                          product.inventory > 0 ? (
-                            <span className="in-stock"> • In Stock</span>
-                          ) : (
-                            <span className="out-of-stock"> • Out of Stock</span>
-                          )
-                        ) : (
-                          <span className="in-stock"> • In Stock</span>
-                        )}
-                      </span>
-                    </>
-                  );
-                })()}
-              </span>
+          <div className="product-header">
+            <h1 className="product-title">
+              {product.scientificName ? (
+                <>
+                  <span className="scientific-name">{product.scientificName}</span>
+                  <span className="common-name"> ({product.product_name})</span>
+                </>
+              ) : (
+                product.product_name
+              )}
+            </h1>
+            <div className="rating-row">
+              <div className="stars">{renderStars(product.rating)}</div>
+              <span className="review-count">{product.reviewsCount} verified reviews</span>
             </div>
           </div>
 
-          <div className="product-features">
-            {/* <div className="feature-item">
-              <FaTruck />
-              <span>Free Shipping</span>
-            </div> */}
-            <div className="feature-item">
-              <FaUndo />
-              <span>Easy Return Policy</span>
+          <div className="price-card">
+            <div className="price-row">
+              <span className="current-price">₹{calculateDiscountedPrice(product.mrp, product.discount)}</span>
+              {product.discount > 0 && (
+                <span className="mrp">₹{product.mrp}</span>
+              )}
             </div>
-            <div className="feature-item">
-              <FaShieldAlt />
-              <span>Secure Payment</span>
+            {product.discount > 0 && (
+              <span className="discount-badge">Save {product.discount}% Today</span>
+            )}
+          </div>
+
+          <div className="selection-section">
+            <h3>Select Plant Size</h3>
+            <div className="size-options">
+              {["Small", "Medium", "Large"].map(size => (
+                <button 
+                  key={size}
+                  className={`size-btn ${selectedSize === size ? "selected" : ""}`}
+                  onClick={() => setSelectedSize(size)}
+                >
+                  {size}
+                </button>
+              ))}
             </div>
           </div>
 
-          <div className="product-colors">
-            <h3>Color</h3>
-            <div className="color-options">
-              <div
-                className="color-option selected"
-                style={{ backgroundColor: product.color.toLowerCase() }}
-                title={product.color}
-              />
-            </div>
-          </div>
-
-          <div className="delivery-check">
-            <h3>Check Delivery Date</h3>
-            <div className="pincode-input">
-              <input
-                type="text"
-                placeholder="Enter 6-digit pincode"
+          <div className="delivery-card">
+            <h3>Check Delivery Availability</h3>
+            <div className="pincode-input-wrapper">
+              <input 
+                type="text" 
+                placeholder="Enter 6-digit Pincode" 
                 value={pincode}
                 onChange={(e) => setPincode(e.target.value)}
                 maxLength={6}
               />
-              <button onClick={handlePincodeCheck}>Check</button>
+              <button onClick={handlePincodeCheck}>CHECK</button>
             </div>
-            {pincodeError && <div className="error-message">{pincodeError}</div>}
             {deliveryDate && (
-              <div className="delivery-date">
-                <span className="delivery-icon">🚚</span>
-                <span>Expected delivery by {deliveryDate}</span>
-              </div>
+              <p className="delivery-info">
+                <FaTruck /> Estimated delivery by {deliveryDate}
+              </p>
             )}
+            {pincodeError && <p className="error-text">{pincodeError}</p>}
           </div>
 
-          <div className="main-cart-section">
-            <div className="cart-options">
-              {product.sizes && (
-                <div className="size-selection">
-                  <div className="size-header">
-                    <h3>Select Size</h3>
-                    <button
-                      className="size-guide-btn"
-                      onClick={() => setShowSizeGuide(!showSizeGuide)}
-                    >
-                      Size Guide
-                    </button>
-                  </div>
-                  <div className="size-options">
-                    {product.sizes.map((size) => (
-                      <button
-                        key={size}
-                        className={`size-btn ${selectedSize === size ? 'selected' : ''}`}
-                        onClick={() => handleSizeSelect(size)}
-                      >
-                        {size}
-                      </button>
-                    ))}
-                  </div>
-                  {sizeError && <div className="error-message">{sizeError}</div>}
-                  {selectedSize && (
-                    <div className="selected-size-info">
-                      Selected: {selectedSize}
-                    </div>
-                  )}
-                  {showSizeGuide && (
-                    <div className="size-guide">
-                      <h4>Size Guide</h4>
-                      <table>
-                        <thead>
-                          <tr>
-                            <th>Size</th>
-                            <th>Width (cm)</th>
-                            <th>Length (cm)</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {product.sizes.map((size) => (
-                            <tr key={size}>
-                              <td>{size}</td>
-                              <td>{getSizeWidth(size)}</td>
-                              <td>{getSizeLength(size)}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              )}
+          <div className="action-buttons">
+            <div className="quantity-selector">
+              <button onClick={() => setQuantity(Math.max(1, quantity - 1))}>-</button>
+              <span>{quantity}</span>
+              <button onClick={() => setQuantity(quantity + 1)}>+</button>
+            </div>
+            <button className="add-to-cart-btn" onClick={handleAddToCart}>ADD TO CART</button>
+            <button className="buy-now-btn" onClick={handleAddToCart}>BUY NOW</button>
+          </div>
 
-              <div className="quantity-selection">
-                <h3>Quantity</h3>
-                <div className="quantity-controls">
-                  <button
-                    onClick={() => setQuantity((q) => Math.max(1, q - 1))}
-                    disabled={quantity <= 1}
-                  >
-                    -
-                  </button>
-                  <span>{quantity}</span>
-                  <button
-                    onClick={() => setQuantity((q) => q + 1)}
-                    disabled={product.inventory !== undefined && product.inventory !== null && quantity >= product.inventory}
-                  >
-                    +
-                  </button>
+          <div className="product-extra-info">
+            <div className="info-section">
+              <h3>About The Product</h3>
+              <p>{product.product_description}</p>
+              <div className="product-features-grid">
+                <div className="feature">
+                  <IoWaterOutline />
+                  <span>Water twice a week</span>
                 </div>
-
+                <div className="feature">
+                  <IoSunnyOutline />
+                  <span>Bright indirect sunlight</span>
+                </div>
+                <div className="feature">
+                  <IoPawOutline />
+                  <span>Pet Friendly Choice</span>
+                </div>
+                <div className="feature">
+                  <IoLeafOutline />
+                  <span>Easy Care for Beginners</span>
+                </div>
               </div>
             </div>
 
-            <div className="main-cart-actions">
-              <button
-                className="main-add-to-cart-btn"
-                onClick={handleAddToCart}
-                disabled={product.inventory !== undefined && product.inventory !== null && product.inventory <= 0}
-              >
-                <FaShoppingCart /> Add to Cart - ₹{Math.round(calculateDiscountedPrice(currentPrice, product.discount) * quantity)}
-              </button>
-              <button
-                className={`main-wishlist-btn ${isInWishlist(product.id) ? "in-wishlist" : ""}`}
-                onClick={handleAddToWishlist}
-                title={isInWishlist(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
-              >
-                {isInWishlist(product.id) ? <FaHeart /> : <FaRegHeart />}
-              </button>
+            <div className="info-section what-in-box">
+              <h3>What's in the Box</h3>
+              <ul>
+                <li><FaCheckCircle /> Healthy {product.product_name}</li>
+                <li><FaCheckCircle /> Premium 4-6" Nursery Pot</li>
+                <li><FaCheckCircle /> Nutrient-rich Potting Mix</li>
+                <li><FaCheckCircle /> Detailed Care Guide</li>
+              </ul>
             </div>
-
-            <div className="social-share">
-              <h3>Share this product</h3>
-              <div className="social-icons">
-                <a href="#" className="social-icon">
-                  <FaFacebook />
-                </a>
-                <a href="#" className="social-icon">
-                  <FaTwitter />
-                </a>
-                <a href="#" className="social-icon">
-                  <FaInstagram />
-                </a>
-                <a href="#" className="social-icon">
-                  <FaPinterest />
-                </a>
-              </div>
-            </div>
-          </div>
-
-          {showSuccessMessage && (
-            <div className="success-message">
-              Product added to cart successfully!
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="product-tabs-section">
-        <div className="product-tabs">
-          <div className="tab-buttons">
-            <button
-              className={activeTab === "description" ? "active" : ""}
-              onClick={() => setActiveTab("description")}
-            >
-              Description
-            </button>
-            <button
-              className={activeTab === "details" ? "active" : ""}
-              onClick={() => setActiveTab("details")}
-            >
-              Details
-            </button>
-            <button
-              className={activeTab === "reviews" ? "active" : ""}
-              onClick={() => setActiveTab("reviews")}
-            >
-              Reviews ({product.reviewsCount})
-            </button>
-            <button
-              className={activeTab === "shipping" ? "active" : ""}
-              onClick={() => setActiveTab("shipping")}
-            >
-              Shipping & Returns
-            </button>
-          </div>
-
-          <div className="tab-content">
-            {activeTab === "description" && (
-              <div className="description">
-                <p>{product.product_description}</p>
-              </div>
-            )}
-            {activeTab === "details" && (
-              <div className="details">
-                <div className="details-section">
-                  <h4>Product Information</h4>
-                  <ul>
-                    <li><strong>Product Code:</strong> {product.product_code}</li>
-                    <li><strong>Category:</strong> {product.category}</li>
-
-                    <li><strong>Color:</strong> {product.color}</li>
-                    <li><strong>Material:</strong> {product.material}</li>
-                    <li><strong>Product Details:</strong> {product.product_details}</li>
-                    <li><strong>Dimensions:</strong> {product.dimension}</li>
-                  </ul>
-                </div>
-                <div className="details-section">
-                  <h4>Care Instructions</h4>
-                  <p>{product.care_instructions}</p>
-                </div>
-              </div>
-            )}
-            {activeTab === "reviews" && (
-              <div className="reviews">
-                <div className="rating-summary">
-                  <div className="average-rating">
-                    <h3>{product.rating.toFixed(1)}</h3>
-                    <div className="stars">{renderStars(product.rating)}</div>
-                    <p>Based on {product.reviewsCount} reviews</p>
-                  </div>
-                  <div className="rating-distribution">
-                    <div className="rating-bar">
-                      <span>5 Stars</span>
-                      <div className="bar">
-                        <div className="fill" style={{ width: "80%" }}></div>
-                      </div>
-                      <span>80%</span>
-                    </div>
-                    <div className="rating-bar">
-                      <span>4 Stars</span>
-                      <div className="bar">
-                        <div className="fill" style={{ width: "15%" }}></div>
-                      </div>
-                      <span>15%</span>
-                    </div>
-                    <div className="rating-bar">
-                      <span>3 Stars</span>
-                      <div className="bar">
-                        <div className="fill" style={{ width: "3%" }}></div>
-                      </div>
-                      <span>3%</span>
-                    </div>
-                    <div className="rating-bar">
-                      <span>2 Stars</span>
-                      <div className="bar">
-                        <div className="fill" style={{ width: "1%" }}></div>
-                      </div>
-                      <span>1%</span>
-                    </div>
-                    <div className="rating-bar">
-                      <span>1 Star</span>
-                      <div className="bar">
-                        <div className="fill" style={{ width: "1%" }}></div>
-                      </div>
-                      <span>1%</span>
-                    </div>
-                  </div>
-                </div>
-                {product.reviews && product.reviews.length > 0 ? (
-                  <div className="reviews-list">
-                    {product.reviews.map((review, index) => (
-                      <div key={review.id || index} className="review-item">
-                        <div className="review-header">
-                          <h4>{review.name}</h4>
-                          <div className="review-rating">
-                            {renderStars(review.rating)}
-                          </div>
-                          <span className="review-date">{review.date}</span>
-                        </div>
-                        <p className="review-comment">{review.comment}</p>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="no-reviews">
-                    No reviews yet. Be the first to review this product!
-                  </p>
-                )}
-              </div>
-            )}
-            {activeTab === "shipping" && (
-              <div className="shipping-info">
-                <div className="shipping-section">
-                  <h4>Shipping Information</h4>
-                </div>
-                <div className="returns-section">
-                  <h4>Returns Policy</h4>
-                  <ul>
-                    <li>Easy Return Policy</li>
-                    <li>Items must be unused and in original packaging</li>
-                    <li>Refund will be processed within 5-7 business days</li>
-                    <li>Products must be returned within 2 days of delivery</li>
-                  </ul>
-                </div>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="related-products">
-        <h2>You May Also Like</h2>
-        <div className="products-grid">
-          {relatedProducts.map((product) => (
-            <div
-              key={product.id}
-              className="product-card"
-              onClick={() => navigate(`/product/${product.id}`)}
-            >
-              <div className="product-image-container">
-                <OptimizedImage
-                  src={product.image ? (product.image.split(',')[0].trim().startsWith('http') ? product.image.split(',')[0].trim() : (product.image.split(',')[0].trim().startsWith('/') ? product.image.split(',')[0].trim() : `/${product.image.split(',')[0].trim()}`)) : '/placeholder-image.webp'}
-                  alt={product.product_name}
-                  className="product-image"
-                />
-                <div className="views-overlay" title="Views">
-                  <img src="/Eye3.png" alt="views" className="views-icon-img" />
-                  <span>{product.views || 0}</span>
-                </div>
-                <div className="product-actions">
-                  <button
-                    className="product-action-btn cart-btn"
-                    onClick={(e) => handleRelatedProductAction(e, 'cart', product)}
-                    title="Add to Cart"
-                    disabled={product.inventory <= 0}
-                  >
-                    <FaShoppingCart />
-                  </button>
-                  <button
-                    className={`product-action-btn wishlist-btn ${isInWishlist(product.id) ? 'active' : ''}`}
-                    onClick={(e) => handleRelatedProductAction(e, 'wishlist', product)}
-                    title={isInWishlist(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
-                  >
-                    {isInWishlist(product.id) ? <FaHeart /> : <FaRegHeart />}
-                  </button>
-                  <button
-                    className="product-action-btn quickview-btn"
-                    onClick={(e) => handleQuickView(product.id, e)}
-                    title="Quick View"
-                  >
-                    <FaEye />
-                  </button>
-                </div>
-              </div>
-
-              <div className="product-info">
-                <h3 className="product-name">{product.product_name}</h3>
-                <p className="product-category">
-                  {product.category}
-                </p>
-                <div className="product-price">
-                  {(() => {
-                    const priceInfo = formatPriceWithDiscount(product.mrp, product.discount);
-                    return (
-                      <>
-                        {priceInfo.original ? (
-                          <>
-                            <span className="original-price" style={{ textDecoration: 'line-through', color: '#999', fontSize: '14px', marginRight: '5px' }}>
-                              ₹{priceInfo.original}
-                            </span>
-                            <span className="current-price" style={{ color: '#e74c3c', fontWeight: 'bold' }}>
-                              ₹{priceInfo.discounted}
-                            </span>
-                            <span style={{ background: '#e74c3c', color: 'white', padding: '1px 4px', borderRadius: '2px', fontSize: '10px', marginLeft: '4px' }}>
-                              -{priceInfo.discountPercentage}%
-                            </span>
-                          </>
-                        ) : (
-                          <span className="current-price">
-                            ₹{priceInfo.discounted}
-                          </span>
-                        )}
-                      </>
-                    );
-                  })()}
-                </div>
-
-                <button className="shop-now-btn">
-                  Shop Now <FaArrowRight className="" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="recently-viewed">
-        <h2>Recently Viewed</h2>
-        <div className="products-grid">
-          {recentlyViewedProducts.map((product) => (
-            <div
-              key={product.id}
-              className="product-card"
-              onClick={() => navigate(`/product/${product.id}`)}
-            >
-              <div className="product-image-container">
-                <OptimizedImage
-                  src={product.image ? (product.image.split(',')[0].trim().startsWith('http') ? product.image.split(',')[0].trim() : (product.image.split(',')[0].trim().startsWith('/') ? product.image.split(',')[0].trim() : `/${product.image.split(',')[0].trim()}`)) : '/placeholder-image.webp'}
-                  alt={product.product_name}
-                  className="product-image"
-                />
-                <div className="views-overlay" title="Views">
-                  <img src="/Eye3.png" alt="views" className="views-icon-img" />
-                  <span>{product.views || 0}</span>
-                </div>
-                <div className="product-actions">
-                  <button
-                    className="product-action-btn cart-btn"
-                    onClick={(e) => handleRelatedProductAction(e, 'cart', product)}
-                    title="Add to Cart"
-                    disabled={product.inventory <= 0}
-                  >
-                    <FaShoppingCart />
-                  </button>
-                  <button
-                    className={`product-action-btn wishlist-btn ${isInWishlist(product.id) ? 'active' : ''}`}
-                    onClick={(e) => handleRelatedProductAction(e, 'wishlist', product)}
-                    title={isInWishlist(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
-                  >
-                    {isInWishlist(product.id) ? <FaHeart /> : <FaRegHeart />}
-                  </button>
-                  <button
-                    className="product-action-btn quickview-btn"
-                    onClick={(e) => handleQuickView(product.id, e)}
-                    title="Quick View"
-                  >
-                    <FaEye />
-                  </button>
-                </div>
-              </div>
-
-              <div className="product-info">
-                <h3 className="product-name">{product.product_name}</h3>
-                <p className="product-category">
-                  {product.category}
-                </p>
-                <div className="product-price">
-                  <span className="current-price">
-                    ₹{Number(product.mrp).toFixed(2)}
-                  </span>
-                </div>
-
-                <button className="shop-now-btn">
-                  Shop Now <FaArrowRight className="" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="trending-products">
-        <h2>Trending Now</h2>
-        <div className="products-grid">
-          {trendingProducts.map((product) => (
-            <div
-              key={product.id}
-              className="product-card"
-              onClick={() => navigate(`/product/${product.id}`)}
-            >
-              <div className="product-image-container">
-                <OptimizedImage
-                  src={product.image ? (product.image.split(',')[0].trim().startsWith('http') ? product.image.split(',')[0].trim() : (product.image.split(',')[0].trim().startsWith('/') ? product.image.split(',')[0].trim() : `/${product.image.split(',')[0].trim()}`)) : '/placeholder-image.webp'}
-                  alt={product.product_name}
-                  className="product-image"
-                />
-                <div className="views-overlay" title="Views">
-                  <img src="/Eye3.png" alt="views" className="views-icon-img" />
-                  <span>{product.views || 0}</span>
-                </div>
-                <div className="product-actions">
-                  <button
-                    className="product-action-btn cart-btn"
-                    onClick={(e) => handleRelatedProductAction(e, 'cart', product)}
-                    title="Add to Cart"
-                    disabled={product.inventory <= 0}
-                  >
-                    <FaShoppingCart />
-                  </button>
-                  <button
-                    className={`product-action-btn wishlist-btn ${isInWishlist(product.id) ? 'active' : ''}`}
-                    onClick={(e) => handleRelatedProductAction(e, 'wishlist', product)}
-                    title={isInWishlist(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
-                  >
-                    {isInWishlist(product.id) ? <FaHeart /> : <FaRegHeart />}
-                  </button>
-                  <button
-                    className="product-action-btn quickview-btn"
-                    onClick={(e) => handleQuickView(product.id, e)}
-                    title="Quick View"
-                  >
-                    <FaEye />
-                  </button>
-                </div>
-              </div>
-
-              <div className="product-info">
-                <h3 className="product-name">{product.product_name}</h3>
-                <p className="product-category">
-                  {product.category}
-                </p>
-                <div className="product-price">
-                  <span className="current-price">
-                    ₹{Number(product.mrp).toFixed(2)}
-                  </span>
-                </div>
-
-                <button className="shop-now-btn">
-                  Shop Now <FaArrowRight className="" />
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="customer-testimonials">
-        <h2>What Our Customers Say</h2>
-        <div className="testimonials-grid">
-          {dynamicTestimonials.length > 0 ? (
-            dynamicTestimonials.map((testimonial, index) => (
-              <div key={testimonial.id || index} className="testimonial-card">
-                <div className="testimonial-header">
-                  <div className="testimonial-rating">
-                    {renderStars(testimonial.rating || 5)}
-                  </div>
-                  {testimonial.image && (
-                    <div className="testimonial-customer-image">
-                      <img src={testimonial.image} alt={testimonial.author} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover' }} />
-                    </div>
-                  )}
-                </div>
-                <p className="testimonial-comment">{testimonial.text}</p>
-                <div className="testimonial-footer">
-                  <span className="testimonial-name">{testimonial.author}</span>
-                  <span className="testimonial-date">{testimonial.location}</span>
-                </div>
-              </div>
-            ))
-          ) : (
-            [
-              {
-                name: "Sarah Johnson",
-                rating: 5,
-                comment: "Absolutely love this product! The quality is outstanding and it exceeded my expectations.",
-                date: "2 days ago",
-                verified: true
-              },
-              {
-                name: "Michael Brown",
-                rating: 4,
-                comment: "Great product with excellent customer service. Will definitely buy again!",
-                date: "1 week ago",
-                verified: true
-              },
-              {
-                name: "Emily Davis",
-                rating: 5,
-                comment: "The best purchase I've made this year. Highly recommend to everyone!",
-                date: "2 weeks ago",
-                verified: true
-              }
-            ].map((testimonial, index) => (
-              <div key={index} className="testimonial-card">
-                <div className="testimonial-header">
-                  <div className="testimonial-rating">
-                    {renderStars(testimonial.rating)}
-                  </div>
-                  <div className="testimonial-verified">
-                    {testimonial.verified && <span>Verified Purchase</span>}
-                  </div>
-                </div>
-                <p className="testimonial-comment">{testimonial.comment}</p>
-                <div className="testimonial-footer">
-                  <span className="testimonial-name">{testimonial.name}</span>
-                  <span className="testimonial-date">{testimonial.date}</span>
-                </div>
-              </div>
-            ))
-          )}
-        </div>
-      </div>
-
-      <div className="brand-features">
-        {/* <div className="feature-item">
-          <FaTruck />
-          <div className="feature-content">
-            <h3>Free Shipping</h3>
-            <p>On orders over $50</p>
-          </div>
-        </div> */}
-        <div className="feature-item">
-          <FaUndo />
-          <div className="feature-content">
-            <h3>Easy Returns</h3>
-            <p>Easy Return Policy</p>
-          </div>
-        </div>
-        <div className="feature-item">
-          <FaShieldAlt />
-          <div className="feature-content">
-            <h3>Secure Payment</h3>
-            <p>100% secure checkout</p>
-          </div>
-        </div>
-        <div className="feature-item">
-          <FaTag />
-          <div className="feature-content">
-            <h3>Best Price</h3>
-            <p>Guaranteed best prices</p>
           </div>
         </div>
       </div>

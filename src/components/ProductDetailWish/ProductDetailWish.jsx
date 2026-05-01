@@ -367,42 +367,29 @@ const ProductDetailWish = () => {
         </div>
 
         <div className="product-info">
-          <nav className="breadcrumb">
-            <Link to="/">Home</Link> /<Link to="/new-arrivals-wish">Wish Genie</Link> /
-            <Link to={`/new-arrivals-wish?category=${product.Category}`}>
-              {product.Category}
-            </Link>
-          </nav>
+          <div className="product-header">
+            <h1 className="product-title">{product['Sticker Content Main']}</h1>
+            <p className="product-subtitle">{product['Sticker Content Sub']}</p>
+          </div>
 
-          <h1 className="product-title">{product['Sticker Content Main']}</h1>
-          <p className="product-subtitle">{product['Sticker Content Sub']}</p>
-
-          <div className="product-meta">
-            <div className="product-price">
-              <span className="current-price">
-                Price: ₹{product.MRP}
-                <span className="stock-status">
-                  {product.inventory !== undefined && product.inventory !== null ? (
-                    product.inventory > 0 ? (
-                      <span className="in-stock"> • In Stock</span>
-                    ) : (
-                      <span className="out-of-stock"> • Out of Stock</span>
-                    )
-                  ) : (
+          <div className="product-price">
+            <div className="price-row">
+              <span className="current-price">₹{product.MRP}</span>
+              <span className="stock-status">
+                {product.inventory !== undefined && product.inventory !== null ? (
+                  product.inventory > 0 ? (
                     <span className="in-stock"> • In Stock</span>
-                  )}
-                </span>
+                  ) : (
+                    <span className="out-of-stock"> • Out of Stock</span>
+                  )
+                ) : (
+                  <span className="in-stock"> • In Stock</span>
+                )}
               </span>
             </div>
-            
-            {/* View Count and Bought Count section removed */}
           </div>
 
           <div className="product-features">
-            {/* <div className="feature-item">
-              <FaTruck />
-              <span>Free Shipping</span>
-            </div> */}
             <div className="feature-item">
               <FaUndo />
               <span>Easy Return Policy</span>
@@ -411,11 +398,19 @@ const ProductDetailWish = () => {
               <FaShieldAlt />
               <span>Secure Payment</span>
             </div>
+            <div className="feature-item">
+              <FaTruck />
+              <span>Free Shipping Available</span>
+            </div>
+            <div className="feature-item">
+              <FaTag />
+              <span>Best Price Guaranteed</span>
+            </div>
           </div>
 
           <div className="main-cart-section">
             <div className="quantity-selection">
-              <h3>Quantity</h3>
+              <h3>Select Quantity</h3>
               <div className="quantity-controls">
                 <button
                   onClick={() => setQuantity((q) => Math.max(1, q - 1))}
@@ -431,7 +426,6 @@ const ProductDetailWish = () => {
                   +
                 </button>
               </div>
-
             </div>
 
             <div className="main-cart-actions">
@@ -440,7 +434,7 @@ const ProductDetailWish = () => {
                 onClick={handleAddToCart}
                 disabled={product.inventory && product.inventory <= 0}
               >
-                <FaShoppingCart /> Add to Cart - ₹{product.MRP * quantity}
+                <FaShoppingCart /> ADD TO CART - ₹{product.MRP * quantity}
               </button>
               <button
                 className={`main-wishlist-btn ${contextWishlist.includes(product.id) ? "in-wishlist" : ""}`}
@@ -453,18 +447,10 @@ const ProductDetailWish = () => {
             <div className="social-share">
               <h3>Share this product</h3>
               <div className="social-icons">
-                <a href="#" className="social-icon">
-                  <FaFacebook />
-                </a>
-                <a href="#" className="social-icon">
-                  <FaTwitter />
-                </a>
-                <a href="#" className="social-icon">
-                  <FaInstagram />
-                </a>
-                <a href="#" className="social-icon">
-                  <FaPinterest />
-                </a>
+                <a href="#" className="social-icon"><FaFacebook /></a>
+                <a href="#" className="social-icon"><FaTwitter /></a>
+                <a href="#" className="social-icon"><FaInstagram /></a>
+                <a href="#" className="social-icon"><FaPinterest /></a>
               </div>
             </div>
           </div>
@@ -490,7 +476,7 @@ const ProductDetailWish = () => {
               className={activeTab === "details" ? "active" : ""}
               onClick={() => setActiveTab("details")}
             >
-              Details
+              Specifications
             </button>
           </div>
 
@@ -498,8 +484,12 @@ const ProductDetailWish = () => {
             {activeTab === "description" && (
               <div className="description">
                 <p>{product['Product Description']}</p>
-                <h4>Burning Instructions</h4>
-                <p>{product['Burning Instructions']}</p>
+                {product['Burning Instructions'] && (
+                  <>
+                    <h4 style={{marginTop: '24px', color: 'var(--text-dark)'}}>Burning Instructions</h4>
+                    <p>{product['Burning Instructions']}</p>
+                  </>
+                )}
               </div>
             )}
             {activeTab === "details" && (
@@ -507,24 +497,22 @@ const ProductDetailWish = () => {
                 <div className="details-section">
                   <h4>Product Information</h4>
                   <ul>
-                    <li><strong>Product Code:</strong> {product['Product code']}</li>
-                    <li><strong>Category:</strong> {product.Category}</li>
-                    <li><strong>Burn Time:</strong> {product['Burn Time']}</li>
-                    <li><strong>Dimensions:</strong> {product['Height Dimensions']}</li>
-                    <li><strong>Diameter:</strong> {product.Diameter}</li>
-                    <li><strong>Fragrances:</strong> {product.Fragrances}</li>
-                    <li><strong>Jar Type:</strong> {product['Jar type']}</li>
-                    <li><strong>Type of Wax:</strong> {product['Type of wax']}</li>
-                    <li><strong>Wax Color:</strong> {product['Wax color']}</li>
-                    <li><strong>Weight:</strong> {product['Weight']}</li>
-                    <li><strong>Storage:</strong> {product['Storage']}</li>
+                    <li><span>Product Code</span> <strong>{product['Product code']}</strong></li>
+                    <li><span>Category</span> <strong>{product.Category}</strong></li>
+                    <li><span>Burn Time</span> <strong>{product['Burn Time']}</strong></li>
+                    <li><span>Dimensions</span> <strong>{product['Height Dimensions']}</strong></li>
+                    <li><span>Diameter</span> <strong>{product.Diameter}</strong></li>
+                    <li><span>Fragrances</span> <strong>{product.Fragrances}</strong></li>
                   </ul>
                 </div>
                 <div className="details-section">
-                  <h4>Important Information</h4>
+                  <h4>Additional Details</h4>
                   <ul>
-                    <li><strong>Warning:</strong> {product['warning']}</li>
-                    <li><strong>Burning Instructions:</strong> {product['Burning Instructions']}</li>
+                    <li><span>Jar Type</span> <strong>{product['Jar type']}</strong></li>
+                    <li><span>Type of Wax</span> <strong>{product['Type of wax']}</strong></li>
+                    <li><span>Wax Color</span> <strong>{product['Wax color']}</strong></li>
+                    <li><span>Weight</span> <strong>{product['Weight']}</strong></li>
+                    <li><span>Storage</span> <strong>{product['Storage']}</strong></li>
                   </ul>
                 </div>
               </div>
@@ -550,12 +538,6 @@ const ProductDetailWish = () => {
                     <FaHeart />
                   </button>
                   <button
-                    className="action-btn quick-view-btn"
-                    onClick={(e) => handleQuickView(relatedProduct.id, e)}
-                  >
-                    <FaEye />
-                  </button>
-                  <button
                     className="action-btn add-to-cart-btn"
                     onClick={(e) => handleRelatedProductAction(e, 'cart', relatedProduct)}
                   >
@@ -565,57 +547,16 @@ const ProductDetailWish = () => {
               </div>
               <div className="related-product-info">
                 <h3>{relatedProduct['Sticker Content Main']}</h3>
-                <p className="product-subtitle">{relatedProduct['Sticker Content Sub']}</p>
                 <div className="product-price">
-                  <span className="current-price">₹{relatedProduct.MRP}</span>
+                  <span className="current-price" style={{fontSize: '1.1rem'}}>₹{relatedProduct.MRP}</span>
                 </div>
-                {relatedProduct.inventory !== undefined && (
-                  <div className="related-product-stock">
-                    {relatedProduct.inventory > 0 ? (
-                      <span className="in-stock">In Stock</span>
-                    ) : (
-                      <span className="out-of-stock">Out of Stock</span>
-                    )}
-                  </div>
-                )}
               </div>
             </div>
           ))}
-        </div>
-      </div>
-
-      <div className="brand-features" style={{textAlign: 'center'}}>
-        {/* <div className="feature-item">
-          <FaTruck />
-          <div className="feature-content">
-            <h3>Free Shipping</h3>
-            <p>On orders over ₹1499</p>
-          </div>
-        </div> */}
-        <div className="feature-item">
-          <FaUndo />
-          <div className="feature-content">
-            <h3>Easy Returns</h3>
-            <p>Easy return policy</p>
-          </div>
-        </div>
-        <div className="feature-item">
-          <FaShieldAlt />
-          <div className="feature-content">
-            <h3>Secure Payment</h3>
-            <p>100% secure checkout</p>
-          </div>
-        </div>
-        <div className="feature-item">
-          <FaTag />
-          <div className="feature-content">
-            <h3>Best Price</h3>
-            <p>Guaranteed best prices</p>
-          </div>
         </div>
       </div>
     </div>
   );
 };
 
-export default ProductDetailWish; 
+export default ProductDetailWish;

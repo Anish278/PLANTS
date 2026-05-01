@@ -1,7 +1,7 @@
 #root {
   width: 100%;
   max-width: 1200px;
-  margin: 0 auto;  
+  margin: 0 auto;
   font-family: 'Montserrat', sans-serif !important;
   overflow-x: hidden;
 }
@@ -49,8 +49,10 @@
 
 /* Hide scrollbar for IE, Edge and Firefox */
 * {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 /* Maintain scroll functionality while hiding the scrollbar */

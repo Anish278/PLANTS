@@ -12,6 +12,8 @@ import OptimizedImage from '../../Component/OptimizedImage';
 import BlogSection from '../BlogSection/BlogSection.jsx';
 
 
+import ProductCard from '../ProductCard/ProductCard';
+
 const AllProducts = () => {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -308,7 +310,7 @@ const AllProducts = () => {
     // Push out of stock products to the bottom
     const stockA = Number(a.inventory) > 0 ? 1 : 0;
     const stockB = Number(b.inventory) > 0 ? 1 : 0;
-    
+
     if (stockA !== stockB) {
       return stockB - stockA; // In-stock (1) before out-of-stock (0)
     }
@@ -420,7 +422,7 @@ const AllProducts = () => {
       navigate('/all-products');
       return;
     }
-    
+
     // Navigate to category page
     const categoryPath = category.name.toLowerCase().replace(/ & /g, '-').replace(/ /g, '-');
     navigate(`/category/${categoryPath}`);
@@ -761,67 +763,18 @@ const AllProducts = () => {
                     }
                   }
                   return (
-                    <div
+                    <ProductCard
                       key={product.id}
-                      className="product-card"
-                      onClick={() => navigate(addReferrerToUrl(`/product/${product.id}`, location.pathname + location.search))}
-                    >
-                      <div className="product-image-container" style={{ aspectRatio: '3/4' }}>
-                        <OptimizedImage
-                          src={firstImage}
-                          alt={product.product_name}
-                          className="product-image"
-                        />
-                        <div className="views-overlay" title="Views">
-                          <img src="/Eye3.png" alt="views" className="views-icon-img" />
-                          <span>{product.views || 0}</span>
-                        </div>
-
-                        <div className="product-actions">
-                          <button
-                            className="product-action-btn cart-btn"
-                            onClick={(e) => handleAddToCartClick(product, e)}
-                            title="Add to Cart"
-                            disabled={product.inventory <= 0}
-                          >
-                            <FaShoppingCart />
-                          </button>
-                          <button
-                            className={`product-action-btn wishlist-btn ${isInWishlist(product.id) ? 'active' : ''}`}
-                            onClick={(e) => handleAddToWishlistClick(product, e)}
-                            title={isInWishlist(product.id) ? "Remove from Wishlist" : "Add to Wishlist"}
-                          >
-                            {isInWishlist(product.id) ? <FaHeart /> : <FaRegHeart />}
-                          </button>
-                          <button
-                            className="product-action-btn quickview-btn"
-                            onClick={(e) => handleQuickView(product, e)}
-                            title="Quick View"
-                          >
-                            <FaEye />
-                          </button>
-                        </div>
-                      </div>
-
-                      <div className="product-info">
-                        <h3 className="product-name">{product.product_name}</h3>
-                        <p className="product-category">
-                          {product.category}
-                        </p>
-                        <div className="product-price">
-                          <span className="current-price">
-                            ₹{Number(product.mrp).toFixed(2)}
-                          </span>
-                          <span className={`stock-status-badge ${Number(product.inventory) > 0 ? 'in-stock' : 'out-of-stock'}`}>
-                            {Number(product.inventory) > 0 ? 'In Stock' : 'Out of Stock'}
-                          </span>
-                        </div>
-
-                        <button className="shop-now-btn">
-                          Shop Now <FaArrowRight className="" />
-                        </button>
-                      </div>
-                    </div>
+                      product={{
+                        ...product,
+                        firstImage: firstImage
+                      }}
+                      onAddToCart={handleAddToCartClick}
+                      onAddToWishlist={handleAddToWishlistClick}
+                      isInWishlist={isInWishlist(product.id)}
+                      onQuickView={handleQuickView}
+                      navigatePath={addReferrerToUrl(`/product/${product.id}`, location.pathname + location.search)}
+                    />
                   );
                 })}
               </div>

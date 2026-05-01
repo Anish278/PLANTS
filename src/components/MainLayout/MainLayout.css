@@ -1,0 +1,30 @@
+.main-app-layout {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.layout-content-wrapper {
+  flex: 1;
+  background-color: #f9f9f9;
+  padding-top: 80px;
+}
+
+.layout-container {
+  max-width: 1440px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  gap: 30px;
+  padding: 40px 20px;
+}
+
+.main-content-area {
+  min-height: 800px;
+}
+
+@media (max-width: 1024px) {
+  .layout-container {
+    grid-template-columns: 1fr;
+  }
+}

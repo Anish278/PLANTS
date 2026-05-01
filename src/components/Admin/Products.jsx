@@ -2,6 +2,8 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { FaEdit, FaTrash, FaPlus, FaSearch } from 'react-icons/fa';
 import './Products.css';
 import { db } from '../../firebase/config';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import {
   collection,
   getDocs,
@@ -13,7 +15,7 @@ import {
   query,
   where
 } from 'firebase/firestore';
-import { uploadFile } from '../../firebase/storage';
+import axios from 'axios';
 
 const Products = () => {
   const [products, setProducts] = useState([]);
@@ -27,36 +29,41 @@ const Products = () => {
   const [minPrice, setMinPrice] = useState('');
   const [maxPrice, setMaxPrice] = useState('');
   const [formData, setFormData] = useState({
-    product_name: '',
+    plantName: '',
+    subtitle: '',
     category: '',
-    sub_category: '',
-    product_code: '',
-    color: '',
-    product_description: '',
-    material: '',
-    product_details: '',
-    dimension: '',
-    care_instructions: '',
-    inventory: '',
-    mrp: '',
-    discount: '',
-    image: '',
-    views: '',
-    bought: '',
+    price: '',
+    discountPrice: '',
+    stockQuantity: '',
+    productCode: '',
+    imageUrls: [],
+    plantType: '',
+    size: '',
+    potIncluded: false,
+    potType: '',
+    wateringFrequency: '',
+    sunlightRequirement: '',
+    maintenanceLevel: '',
+    fertilizerNeed: '',
+    description: '',
+    benefits: '',
+    isAirPurifying: false,
+    isPetFriendly: false,
+    growthRate: '',
+    lifespan: '',
+    deliveryTime: '',
+    returnPolicy: '',
     featured: false,
-    sizes: '', // Comma-separated string in form
-    variantPrices: '' // Format: "Size:Price, Size:Price"
+    views: 0,
+    bought: 0
   });
   const [isUploadingImage, setIsUploadingImage] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
 
-  // Helper function to get first image from comma-separated string
-  const getFirstImage = (imageField) => {
-    if (!imageField) return null;
-    const imagesArr = imageField.split(',').map(img => img.trim()).filter(Boolean);
-    if (imagesArr.length > 0) {
-      return imagesArr[0].startsWith('/') ? imagesArr[0] : `/${imagesArr[0]}`;
-    }
-    return null;
+  // Helper function to get first image from array
+  const getFirstImage = (imageUrls) => {
+    if (!imageUrls || !Array.isArray(imageUrls) || imageUrls.length === 0) return null;
+    return imageUrls[0];
   };
 
   // Helper function to get all media items with types
@@ -75,11 +82,11 @@ const Products = () => {
   const processedProducts = useMemo(() => {
     return products.map(product => ({
       ...product,
-      firstImage: getFirstImage(product.image),
-      product_name: product.product_name || 'Unnamed Product',
+      firstImage: getFirstImage(product.imageUrls),
+      plantName: product.plantName || 'Unnamed Plant',
       category: product.category || 'Uncategorized',
-      mrp: product.mrp || 0,
-      inventory: product.inventory || 0,
+      price: product.price || 0,
+      stockQuantity: product.stockQuantity || 0,
       views: product.views || 0
     }));
   }, [products]);
@@ -89,11 +96,11 @@ const Products = () => {
     return processedProducts.filter(product => {
       // Search filter - check product code and name
       const searchMatch = !searchTerm ||
-        (product.product_code && product.product_code.toLowerCase().includes(searchTerm.toLowerCase())) ||
-        (product.product_name && product.product_name.toLowerCase().includes(searchTerm.toLowerCase()));
+        (product.productCode && product.productCode.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (product.plantName && product.plantName.toLowerCase().includes(searchTerm.toLowerCase()));
 
       // Price filter
-      const price = Number(product.mrp) || 0;
+      const price = Number(product.price) || 0;
       const minPriceFilter = !minPrice || price >= Number(minPrice);
       const maxPriceFilter = !maxPrice || price <= Number(maxPrice);
 
@@ -128,188 +135,196 @@ const Products = () => {
   };
 
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setFormData(prev => ({
       ...prev,
-      [name]: name === 'featured' ? value === 'true' : value
+      [name]: type === 'checkbox' ? checked : value
     }));
   };
 
   const handleImageUpload = async (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
+    const files = Array.from(e.target.files);
+    if (files.length === 0) return;
+
+    setIsUploadingImage(true);
+    setUploadProgress(0);
+
+    // Get Cloudinary config from environment variables with fallbacks
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME || 'drzgk4yba';
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET || 'plant_upload';
+
+    console.log('Starting upload to Cloudinary...', { cloudName, uploadPreset, filesCount: files.length });
 
     try {
-      setIsUploadingImage(true);
-      const fileExtension = file.name.split('.').pop();
-      const fileName = `${Date.now()}_${Math.random().toString(36).substring(7)}.${fileExtension}`;
-      const path = `products/${fileName}`;
-      
-      const downloadURL = await uploadFile(file, path);
-      
-      setFormData(prev => {
-        const existingImages = prev.image ? prev.image.split(',').map(i => i.trim()).filter(Boolean) : [];
-        existingImages.push(downloadURL);
-        return {
+      const uploadedUrls = [];
+
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        console.log(`Uploading file ${i + 1}/${files.length}: ${file.name}`);
+
+        const formDataCloudinary = new FormData();
+        formDataCloudinary.append('file', file);
+        formDataCloudinary.append('upload_preset', uploadPreset);
+
+        try {
+          // Using 'auto' resource type to support both images and videos automatically
+          const response = await axios.post(
+            `https://api.cloudinary.com/v1_1/${cloudName}/auto/upload`,
+            formDataCloudinary,
+            {
+              onUploadProgress: (progressEvent) => {
+                const fileProgress = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+                // Calculate overall progress across all files
+                const totalProgress = Math.round(((i * 100) + fileProgress) / files.length);
+                setUploadProgress(totalProgress);
+              }
+            }
+          );
+
+          if (response.data.secure_url) {
+            uploadedUrls.push(response.data.secure_url);
+            console.log(`Successfully uploaded: ${file.name} -> ${response.data.secure_url}`);
+          }
+        } catch (fileErr) {
+          console.error(`Error uploading file ${file.name}:`, fileErr);
+          const errorDetail = fileErr.response?.data?.error?.message || fileErr.message;
+          toast.error(`Failed to upload ${file.name}: ${errorDetail}`);
+          // Continue with other files if one fails
+        }
+      }
+
+      if (uploadedUrls.length > 0) {
+        setFormData(prev => ({
           ...prev,
-          image: existingImages.join(', ')
-        };
-      });
-      
+          imageUrls: [...prev.imageUrls, ...uploadedUrls]
+        }));
+        toast.success(`Successfully uploaded ${uploadedUrls.length} file(s)`);
+      }
+
     } catch (err) {
-      console.error('Error uploading image:', err);
-      setError('Failed to upload image: ' + err.message);
+      console.error('General error in handleImageUpload:', err);
+      const errorMsg = 'An unexpected error occurred during upload. Please try again.';
+      setError(errorMsg);
+      toast.error(errorMsg);
     } finally {
       setIsUploadingImage(false);
+      setUploadProgress(0);
     }
+  };
+
+  const removeImage = (indexToRemove) => {
+    setFormData(prev => ({
+      ...prev,
+      imageUrls: prev.imageUrls.filter((_, index) => index !== indexToRemove)
+    }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (isUploadingImage) return;
+
     try {
-      console.log('Form data before processing:', formData);
-
-      // Helper to parse variant prices string into object
-      const parseVariantPrices = (str) => {
-        if (!str) return {};
-        const prices = {};
-        str.split(',').forEach(item => {
-          const [size, price] = item.split(':').map(s => s.trim());
-          if (size && price) {
-            prices[size] = Number(price);
-          }
-        });
-        return prices;
-      };
-
-      const finalSizes = formData.sizes ? formData.sizes.split(',').map(s => s.trim()).filter(Boolean) : [];
-      const finalVariantPrices = parseVariantPrices(formData.variantPrices);
-
-      // Convert numeric fields to numbers
-      const numericFormData = {
+      // Convert numeric fields
+      const processedData = {
         ...formData,
-        cost_price: Number(formData.cost_price),
-        inventory: Number(formData.inventory),
-        mrp: Number(formData.mrp),
-        discount: formData.discount ? Number(formData.discount) : 0,
-        views: formData.views === '' ? 0 : Number(formData.views),
-        bought: formData.bought === '' ? 0 : Number(formData.bought),
-        sizes: finalSizes,
-        variantPrices: finalVariantPrices
+        price: Number(formData.price) || 0,
+        discountPrice: Number(formData.discountPrice) || 0,
+        stockQuantity: Number(formData.stockQuantity) || 0,
+        views: Number(formData.views) || 0,
+        bought: Number(formData.bought) || 0,
+        updatedAt: serverTimestamp()
       };
-
-      console.log('Numeric form data:', numericFormData);
-      console.log('Discount value:', numericFormData.discount);
 
       if (selectedProduct) {
         // Update existing product
-        console.log('Updating product with ID:', selectedProduct.id, typeof selectedProduct.id);
-
-        if (typeof selectedProduct.id === 'number') {
-          // If ID is a number, handle as a string or find the document by query
-          const productsRef = collection(db, 'products');
-          const q = query(productsRef, where('id', '==', selectedProduct.id));
-          const querySnapshot = await getDocs(q);
-
-          if (!querySnapshot.empty) {
-            const docRef = querySnapshot.docs[0].ref;
-            const updateData = {
-              ...numericFormData,
-              updatedAt: serverTimestamp()
-            };
-            console.log('Updating product with data:', updateData);
-            await updateDoc(docRef, updateData);
-            console.log('Product updated in Firebase by numeric ID:', selectedProduct.id);
-          } else {
-            throw new Error(`Product with numeric ID ${selectedProduct.id} not found`);
-          }
-        } else {
-          // If ID is a string (document ID), update directly
-          const productRef = doc(db, 'products', selectedProduct.id);
-          const updateData = {
-            ...numericFormData,
-            updatedAt: serverTimestamp()
-          };
-          console.log('Updating product with data:', updateData);
-          await updateDoc(productRef, updateData);
-          console.log('Product updated in Firebase by document ID:', selectedProduct.id);
-        }
+        const productRef = doc(db, 'products', selectedProduct.id);
+        await updateDoc(productRef, processedData);
+        console.log('Product updated in Firebase:', selectedProduct.id);
       } else {
-        // Create new product with a unique ID
+        // Create new product
         const newProductRef = doc(collection(db, 'products'));
-        // Generate a new numeric ID for the product
-        const highestId = products.reduce((max, product) =>
-          (product.id && typeof product.id === 'number' && product.id > max) ? product.id : max, 0);
-
         await setDoc(newProductRef, {
-          ...numericFormData,
-          id: highestId + 1, // Ensure a unique numeric ID for compatibility
-          createdAt: serverTimestamp(),
-          updatedAt: serverTimestamp()
+          ...processedData,
+          createdAt: serverTimestamp()
         });
         console.log('New product added to Firebase:', newProductRef.id);
       }
 
       setShowModal(false);
       setSelectedProduct(null);
-      setFormData({
-        image: '',
-        views: '',
-        bought: '',
-        featured: false,
-        sizes: '',
-        variantPrices: ''
-      });
-
-      // Refresh the products list
+      resetFormData();
       fetchProducts();
+      toast.success(selectedProduct ? 'Product updated successfully!' : 'Product saved successfully!');
     } catch (err) {
       console.error('Error saving product to Firebase:', err);
-      setError('Failed to save product: ' + err.message);
+      const errorMsg = 'Failed to save product: ' + err.message;
+      setError(errorMsg);
+      toast.error(errorMsg);
     }
   };
 
+  const resetFormData = () => {
+    setFormData({
+      plantName: '',
+      subtitle: '',
+      category: '',
+      price: '',
+      discountPrice: '',
+      stockQuantity: '',
+      productCode: '',
+      imageUrls: [],
+      plantType: '',
+      size: '',
+      potIncluded: false,
+      potType: '',
+      wateringFrequency: '',
+      sunlightRequirement: '',
+      maintenanceLevel: '',
+      fertilizerNeed: '',
+      description: '',
+      benefits: '',
+      isAirPurifying: false,
+      isPetFriendly: false,
+      growthRate: '',
+      lifespan: '',
+      deliveryTime: '',
+      returnPolicy: '',
+      featured: false,
+      views: 0,
+      bought: 0
+    });
+  };
+
   const handleEdit = (product) => {
-    console.log('Editing product:', product);
-    console.log('Product discount value:', product.discount);
     setSelectedProduct(product);
     setFormData({
-      product_name: product.product_name || '',
+      plantName: product.plantName || '',
+      subtitle: product.subtitle || '',
       category: product.category || '',
-      sub_category: product.sub_category || '',
-      product_code: product.product_code || '',
-      color: product.color || '',
-      product_description: product.product_description || '',
-      material: product.material || '',
-      product_details: product.product_details || '',
-      dimension: product.dimension || '',
-      care_instructions: product.care_instructions || '',
-      inventory: product.inventory || '',
-      mrp: product.mrp || '',
-      discount: product.discount || '',
-      image: product.image || '',
-      views: product.views || '',
-      bought: product.bought || '',
+      price: product.price || '',
+      discountPrice: product.discountPrice || '',
+      stockQuantity: product.stockQuantity || '',
+      productCode: product.productCode || '',
+      imageUrls: Array.isArray(product.imageUrls) ? product.imageUrls : [],
+      plantType: product.plantType || '',
+      size: product.size || '',
+      potIncluded: product.potIncluded || false,
+      potType: product.potType || '',
+      wateringFrequency: product.wateringFrequency || '',
+      sunlightRequirement: product.sunlightRequirement || '',
+      maintenanceLevel: product.maintenanceLevel || '',
+      fertilizerNeed: product.fertilizerNeed || '',
+      description: product.description || '',
+      benefits: product.benefits || '',
+      isAirPurifying: product.isAirPurifying || false,
+      isPetFriendly: product.isPetFriendly || false,
+      growthRate: product.growthRate || '',
+      lifespan: product.lifespan || '',
+      deliveryTime: product.deliveryTime || '',
+      returnPolicy: product.returnPolicy || '',
       featured: product.featured || false,
-      sizes: Array.isArray(product.sizes) ? product.sizes.join(', ') : '',
-      variantPrices: product.variantPrices ? Object.entries(product.variantPrices).map(([size, price]) => `${size}:${price}`).join(', ') : ''
-    });
-    console.log('Form data set to:', {
-      product_name: product.product_name || '',
-      category: product.category || '',
-      sub_category: product.sub_category || '',
-      product_code: product.product_code || '',
-      color: product.color || '',
-      product_description: product.product_description || '',
-      material: product.material || '',
-      product_details: product.product_details || '',
-      dimension: product.dimension || '',
-      care_instructions: product.care_instructions || '',
-      inventory: product.inventory || '',
-      mrp: product.mrp || '',
-      discount: product.discount || '',
-      image: product.image || '',
-      featured: product.featured || false
+      views: product.views || 0,
+      bought: product.bought || 0
     });
     setShowModal(true);
   };
@@ -446,10 +461,16 @@ const Products = () => {
   };
 
   if (loading) return <div className="loading">Loading...</div>;
-  if (error) return <div className="error">{error}</div>;
 
   return (
     <div className="products-container">
+      <ToastContainer position="top-right" autoClose={3000} />
+      {error && (
+        <div className="error-banner">
+          {error}
+          <button className="close-error" onClick={() => setError(null)}>×</button>
+        </div>
+      )}
       <div className="products-header">
         <h2>Products Management</h2>
         <div className="header-buttons">
@@ -584,7 +605,7 @@ const Products = () => {
               <th>Product Code</th>
               <th>Category</th>
               <th>Price</th>
-              <th>Inventory</th>
+              <th>Stock</th>
               <th>Views</th>
               <th>Bought</th>
               <th>Actions</th>
@@ -622,11 +643,11 @@ const Products = () => {
                   )}
                 </td>
 
-                <td>{product.product_name}</td>
-                <td>{product.product_code || 'N/A'}</td>
+                <td>{product.plantName}</td>
+                <td>{product.productCode || 'N/A'}</td>
                 <td>{product.category}</td>
-                <td>₹{product.mrp}</td>
-                <td>{product.inventory}</td>
+                <td>₹{product.price}</td>
+                <td>{product.stockQuantity}</td>
                 <td>{product.views || 0}</td>
                 <td>{product.bought || 0}</td>
                 <td className="action-buttons">
@@ -654,261 +675,207 @@ const Products = () => {
           <div className="modaloverlay">
             <div className="modal-content">
               <h3>{selectedProduct ? 'Edit Product' : 'Add New Product'}</h3>
-              <form onSubmit={handleSubmit}>
-                <div className="form-group">
-                  <label>Product Name</label>
-                  <input
-                    type="text"
-                    name="product_name"
-                    value={formData.product_name}
-                    onChange={handleInputChange}
-                    required
-                  />
+              <form onSubmit={handleSubmit} className="plant-product-form">
+                <div className="form-section">
+                  <h4>Basic Information</h4>
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label>Plant Name</label>
+                      <input type="text" name="plantName" value={formData.plantName} onChange={handleInputChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label>Subtitle / Small Description</label>
+                      <input type="text" name="subtitle" value={formData.subtitle} onChange={handleInputChange} />
+                    </div>
+                    <div className="form-group">
+                      <label>Category</label>
+                      <select name="category" value={formData.category} onChange={handleInputChange} required>
+                        <option value="">Select Category</option>
+                        <option value="Indoor">Indoor</option>
+                        <option value="Outdoor">Outdoor</option>
+                        <option value="Succulent">Succulent</option>
+                        <option value="Flowering">Flowering</option>
+                        <option value="Bonsai">Bonsai</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Product Code</label>
+                      <input type="text" name="productCode" value={formData.productCode} onChange={handleInputChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label>Price (₹)</label>
+                      <input type="number" name="price" value={formData.price} onChange={handleInputChange} required />
+                    </div>
+                    <div className="form-group">
+                      <label>Discount Price (₹)</label>
+                      <input type="number" name="discountPrice" value={formData.discountPrice} onChange={handleInputChange} />
+                    </div>
+                    <div className="form-group">
+                      <label>Stock Quantity</label>
+                      <input type="number" name="stockQuantity" value={formData.stockQuantity} onChange={handleInputChange} required />
+                    </div>
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Category</label>
-                  <input
-                    type="text"
-                    name="category"
-                    value={formData.category}
-                    onChange={handleInputChange}
-                    required
-                  />
+
+                <div className="form-section">
+                  <h4>Plant Details</h4>
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label>Plant Type</label>
+                      <select name="plantType" value={formData.plantType} onChange={handleInputChange}>
+                        <option value="">Select Type</option>
+                        <option value="Indoor">Indoor</option>
+                        <option value="Outdoor">Outdoor</option>
+                        <option value="Semi-shade">Semi-shade</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Size (e.g., Small, Medium, Large)</label>
+                      <input type="text" name="size" value={formData.size} onChange={handleInputChange} />
+                    </div>
+                    <div className="form-group checkbox-group">
+                      <label>
+                        <input type="checkbox" name="potIncluded" checked={formData.potIncluded} onChange={handleInputChange} />
+                        Pot Included
+                      </label>
+                    </div>
+                    <div className="form-group">
+                      <label>Pot Type</label>
+                      <select name="potType" value={formData.potType} onChange={handleInputChange}>
+                        <option value="">Select Pot Type</option>
+                        <option value="Plastic">Plastic</option>
+                        <option value="Ceramic">Ceramic</option>
+                        <option value="Grow Bag">Grow Bag</option>
+                        <option value="None">None</option>
+                      </select>
+                    </div>
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Sub Category</label>
-                  <input
-                    type="text"
-                    name="sub_category"
-                    value={formData.sub_category}
-                    onChange={handleInputChange}
-                  />
+
+                <div className="form-section">
+                  <h4>Care & Info</h4>
+                  <div className="form-grid">
+                    <div className="form-group">
+                      <label>Watering Frequency</label>
+                      <input type="text" name="wateringFrequency" value={formData.wateringFrequency} onChange={handleInputChange} placeholder="e.g. Twice a week" />
+                    </div>
+                    <div className="form-group">
+                      <label>Sunlight Requirement</label>
+                      <select name="sunlightRequirement" value={formData.sunlightRequirement} onChange={handleInputChange}>
+                        <option value="">Select Requirement</option>
+                        <option value="Low">Low</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Bright">Bright</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Maintenance Level</label>
+                      <select name="maintenanceLevel" value={formData.maintenanceLevel} onChange={handleInputChange}>
+                        <option value="">Select Level</option>
+                        <option value="Easy">Easy</option>
+                        <option value="Moderate">Moderate</option>
+                        <option value="High">High</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Fertilizer Need</label>
+                      <input type="text" name="fertilizerNeed" value={formData.fertilizerNeed} onChange={handleInputChange} />
+                    </div>
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Product Code</label>
-                  <input
-                    type="text"
-                    name="product_code"
-                    value={formData.product_code}
-                    onChange={handleInputChange}
-                    required
-                  />
+
+                <div className="form-section">
+                  <h4>Description & Benefits</h4>
+                  <div className="form-group">
+                    <label>Description</label>
+                    <textarea name="description" value={formData.description} onChange={handleInputChange} required />
+                  </div>
+                  <div className="form-group">
+                    <label>Benefits</label>
+                    <textarea name="benefits" value={formData.benefits} onChange={handleInputChange} />
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Color</label>
-                  <input
-                    type="text"
-                    name="color"
-                    value={formData.color}
-                    onChange={handleInputChange}
-                  />
+
+                <div className="form-section">
+                  <h4>Extra Information</h4>
+                  <div className="form-grid">
+                    <div className="form-group checkbox-group">
+                      <label>
+                        <input type="checkbox" name="isAirPurifying" checked={formData.isAirPurifying} onChange={handleInputChange} />
+                        Air Purifying
+                      </label>
+                    </div>
+                    <div className="form-group checkbox-group">
+                      <label>
+                        <input type="checkbox" name="isPetFriendly" checked={formData.isPetFriendly} onChange={handleInputChange} />
+                        Pet Friendly
+                      </label>
+                    </div>
+                    <div className="form-group">
+                      <label>Growth Rate</label>
+                      <select name="growthRate" value={formData.growthRate} onChange={handleInputChange}>
+                        <option value="">Select Growth Rate</option>
+                        <option value="Slow">Slow</option>
+                        <option value="Medium">Medium</option>
+                        <option value="Fast">Fast</option>
+                      </select>
+                    </div>
+                    <div className="form-group">
+                      <label>Lifespan</label>
+                      <input type="text" name="lifespan" value={formData.lifespan} onChange={handleInputChange} />
+                    </div>
+                    <div className="form-group">
+                      <label>Delivery Time</label>
+                      <input type="text" name="deliveryTime" value={formData.deliveryTime} onChange={handleInputChange} />
+                    </div>
+                    <div className="form-group">
+                      <label>Return Policy</label>
+                      <input type="text" name="returnPolicy" value={formData.returnPolicy} onChange={handleInputChange} />
+                    </div>
+                    <div className="form-group checkbox-group">
+                      <label>
+                        <input type="checkbox" name="featured" checked={formData.featured} onChange={handleInputChange} />
+                        Featured Product
+                      </label>
+                    </div>
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Description</label>
-                  <textarea
-                    name="product_description"
-                    value={formData.product_description}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Material</label>
-                  <input
-                    type="text"
-                    name="material"
-                    value={formData.material}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Product Details</label>
-                  <textarea
-                    name="product_details"
-                    value={formData.product_details}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Dimension</label>
-                  <input
-                    type="text"
-                    name="dimension"
-                    value={formData.dimension}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Care Instructions</label>
-                  <textarea
-                    name="care_instructions"
-                    value={formData.care_instructions}
-                    onChange={handleInputChange}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Inventory</label>
-                  <input
-                    type="number"
-                    name="inventory"
-                    value={formData.inventory}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>MRP</label>
-                  <input
-                    type="number"
-                    name="mrp"
-                    value={formData.mrp}
-                    onChange={handleInputChange}
-                    required
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Discount (%)</label>
-                  <input
-                    type="number"
-                    name="discount"
-                    value={formData.discount}
-                    onChange={handleInputChange}
-                    min="0"
-                    max="100"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Views (people)</label>
-                  <input
-                    type="number"
-                    name="views"
-                    value={formData.views}
-                    onChange={handleInputChange}
-                    min="0"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Bought (count)</label>
-                  <input
-                    type="number"
-                    name="bought"
-                    value={formData.bought}
-                    onChange={handleInputChange}
-                    min="0"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Image URL (or Upload new image)</label>
-                  <div style={{ display: 'flex', gap: '10px', marginBottom: '10px', alignItems: 'center' }}>
-                    <input 
-                      type="file" 
+
+                <div className="form-section">
+                  <h4>Product Images</h4>
+                  <div className="image-upload-wrapper">
+                    <input
+                      type="file"
+                      multiple
                       accept="image/*,video/*"
                       onChange={handleImageUpload}
                       disabled={isUploadingImage}
+                      id="image-upload-input"
                     />
-                    {isUploadingImage && <span style={{ color: '#007bff' }}>Uploading...</span>}
+                    <label htmlFor="image-upload-input" className="upload-label">
+                      {isUploadingImage ? `Uploading... ${uploadProgress}%` : 'Upload Images'}
+                    </label>
                   </div>
-                  <input
-                    type="text"
-                    name="image"
-                    value={formData.image}
-                    onChange={handleInputChange}
-                    required
-                    placeholder="Enter image URL or upload using the button above"
-                  />
-                  {formData.image && (
-                    <div className="media-preview">
-                      {getMediaItems(formData.image).map((media, idx) => (
-                        media.isVideo ? (
-                          <video
-                            key={idx}
-                            src={media.src}
-                            className="media-preview-item"
-                            muted
-                            autoPlay
-                            loop
-                            playsInline
-                          />
-                        ) : (
-                          <img
-                            key={idx}
-                            src={media.src}
-                            alt={`Preview ${idx + 1}`}
-                            className="media-preview-item"
-                            onError={(e) => e.target.style.display = 'none'}
-                          />
-                        )
-                      ))}
-                    </div>
-                  )}
+
+                  <div className="image-previews">
+                    {formData.imageUrls.map((url, index) => (
+                      <div key={index} className="preview-item">
+                        <img src={url} alt={`Preview ${index}`} />
+                        <button type="button" className="remove-img-btn" onClick={() => removeImage(index)}>×</button>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-                <div className="form-group">
-                  <label>Featured Product</label>
-                  <select
-                    name="featured"
-                    value={formData.featured}
-                    onChange={handleInputChange}
-                  >
-                    <option value={false}>No</option>
-                    <option value={true}>Yes</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Sizes (comma separated)</label>
-                  <input
-                    type="text"
-                    name="sizes"
-                    value={formData.sizes}
-                    onChange={handleInputChange}
-                    placeholder="Set of 4, Set of 6, Standard"
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Variant Prices (Format: Size:Price, Size:Price)</label>
-                  <input
-                    type="text"
-                    name="variantPrices"
-                    value={formData.variantPrices}
-                    onChange={handleInputChange}
-                    placeholder="Set of 4:1500, Set of 6:2200"
-                  />
-                  <small style={{ color: '#666' }}>Note: If a size's price is not specified, it will use the base MRP.</small>
-                </div>
+
                 <div className="modal-buttons">
-                  <button type="submit" className="save-btn">
-                    {selectedProduct ? 'Update' : 'Save'}
+                  <button type="submit" className="save-btn" disabled={isUploadingImage}>
+                    {isUploadingImage ? 'Uploading images...' : (selectedProduct ? 'Update Product' : 'Save Product')}
                   </button>
-                  <button
-                    type="button"
-                    className="cancel-btn"
-                    onClick={() => {
-                      setShowModal(false);
-                      setSelectedProduct(null);
-                      setFormData({
-                        product_name: '',
-                        category: '',
-                        sub_category: '',
-                        product_code: '',
-                        color: '',
-                        product_description: '',
-                        material: '',
-                        product_details: '',
-                        dimension: '',
-                        care_instructions: '',
-                        inventory: '',
-                        mrp: '',
-                        discount: '',
-                        image: '',
-                        views: '',
-                        bought: '',
-                        featured: false,
-                        sizes: '',
-                        variantPrices: ''
-                      });
-                    }}
-                  >
-                    Cancel
-                  </button>
+                  <button type="button" className="cancel-btn" onClick={() => {
+                    setShowModal(false);
+                    setSelectedProduct(null);
+                    resetFormData();
+                  }}>Cancel</button>
                 </div>
               </form>
             </div>
