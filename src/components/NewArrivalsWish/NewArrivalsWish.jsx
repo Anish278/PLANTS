@@ -33,10 +33,10 @@ const NewArrivalsWish = () => {
   const [dataLoaded, setDataLoaded] = useState(false);
   const [error, setError] = useState(null);
   const [availableCategories, setAvailableCategories] = useState([]);
-  
+
   const mainSliderRef = useRef(null);
   const categorySliderRefs = useRef({});
-  
+
   // Create refs for categories dynamically
   const getSliderRef = (key) => {
     if (key === 'main') return mainSliderRef;
@@ -45,7 +45,7 @@ const NewArrivalsWish = () => {
     }
     return categorySliderRefs.current[key];
   };
-  
+
   const autoScrollTimer = useRef(null);
 
   const sliderSettings = {
@@ -122,25 +122,25 @@ const NewArrivalsWish = () => {
       try {
         setLoading(true);
         setError(null);
-        
+
         let products = await getWishGenieProducts();
-        
+
         // If no products exist, initialize the collection with a test product
         if (products.length === 0) {
           console.log('No products found, initializing collection...');
           await initializeWishGenieCollection();
           products = await getWishGenieProducts();
         }
-        
+
         console.log('Fetched products:', products);
-        
+
         // Extract unique categories from products
         const categories = [...new Set(products
           .filter(p => p.image && p.image.trim() !== '')
           .map(p => p.Category))]
           .filter(Boolean);
         setAvailableCategories(categories);
-        
+
         // Sort products by creation date (newest first)
         const sortByCreationDate = (products) => {
           return products.sort((a, b) => {
@@ -153,20 +153,20 @@ const NewArrivalsWish = () => {
         // Categorize products based on their actual categories and sort by creation date
         const categorizedProducts = {};
         categories.forEach(category => {
-          const categoryProducts = products.filter(p => 
-            p.Category === category && 
-            p.image && 
+          const categoryProducts = products.filter(p =>
+            p.Category === category &&
+            p.image &&
             p.image.trim() !== ''
           );
           categorizedProducts[category] = sortByCreationDate(categoryProducts);
         });
-        
+
         setCategoryProducts(categorizedProducts);
         setWishGenieProducts(sortByCreationDate(products.filter(p => p.image && p.image.trim() !== '')));
-        
+
         // Set featured product - prioritize products with discounts or select the first product
         const featuredProduct = products.find(p => p.discount > 0) || products[0];
-        
+
         if (featuredProduct) {
           // Ensure all required fields are present
           const enhancedFeaturedProduct = {
@@ -179,7 +179,7 @@ const NewArrivalsWish = () => {
           };
           setFeaturedProduct(enhancedFeaturedProduct);
         }
-        
+
         setDataLoaded(true);
         setError(null);
       } catch (err) {
@@ -195,12 +195,12 @@ const NewArrivalsWish = () => {
 
   const categories = ["all", ...availableCategories];
 
-  const filteredProducts = activeTab === "all" 
-    ? wishGenieProducts 
+  const filteredProducts = activeTab === "all"
+    ? wishGenieProducts
     : wishGenieProducts.filter(product => {
-        const hasImage = product.image && product.image.trim() !== '';
-        return product.Category && product.Category.toLowerCase() === activeTab && hasImage;
-      });
+      const hasImage = product.image && product.image.trim() !== '';
+      return product.Category && product.Category.toLowerCase() === activeTab && hasImage;
+    });
 
   const handleAddToCart = (product, e) => {
     if (e) e.stopPropagation();
@@ -213,7 +213,7 @@ const NewArrivalsWish = () => {
       id: product.id,
       name: product['Sticker Content Main'] || product.name || product.product_name || 'Product',
       price: Number(product.MRP) || Number(product.price) || 0,
-              image: product.image || '/placeholder-image.webp',
+      image: product.image || '/placeholder-image.webp',
       category: product.Category || product.category || '',
       quantity: 1,
       discount: Number(product.discount) || 0,
@@ -287,7 +287,7 @@ const NewArrivalsWish = () => {
     if (!price) return '0.00';
     const numPrice = Number(price);
     if (isNaN(numPrice)) return '0.00';
-    
+
     if (discount) {
       const discountedPrice = numPrice * (1 - discount / 100);
       return discountedPrice.toFixed(2);
@@ -332,16 +332,16 @@ const NewArrivalsWish = () => {
   // Render product card - reusable component for all product sections
   const renderProductCard = (product) => {
     return (
-      <div 
-        key={product.id} 
+      <div
+        key={product.id}
         className="wish-product-card"
-                        onClick={() => navigate(addReferrerToUrl(`/product-wish/${product.id}`, location.pathname + location.search))}
+        onClick={() => navigate(addReferrerToUrl(`/product-wish/${product.id}`, location.pathname + location.search))}
       >
         <div className="wish-product-image">
-          <img 
-            src={getFirstImage(product.image)} 
-            alt="" 
-            className={product.inventory <= 0 ? 'out-of-stock-image' : ''} 
+          <img
+            src={getFirstImage(product.image)}
+            alt=""
+            className={product.inventory <= 0 ? 'out-of-stock-image' : ''}
           />
           {product.inventory <= 0 && (
             <div className="out-of-stock-overlay">
@@ -349,21 +349,21 @@ const NewArrivalsWish = () => {
             </div>
           )}
           <div className="wish-product-actions">
-            <button 
-              className="wish-action-btn cart-btn" 
+            <button
+              className="wish-action-btn cart-btn"
               onClick={(e) => handleAddToCart(product, e)}
               title="Add to Cart"
             >
               <FaShoppingCart />
             </button>
-            <button 
+            <button
               className={`wish-action-btn wishlist-btn ${isInWishlist(product.id) ? 'active' : ''}`}
               onClick={(e) => handleAddToWishlist(product, e)}
               title="Add to Wishlist"
             >
               <FaHeart />
             </button>
-            <button 
+            <button
               className="wish-action-btn quickview-btn"
               onClick={(e) => handleQuickView(product.id, e)}
               title="Quick View"
@@ -410,8 +410,8 @@ const NewArrivalsWish = () => {
           </Link>
         </div>
         <div className="wish-products-container">
-          <button 
-            className="wish-scroll-button left" 
+          <button
+            className="wish-scroll-button left"
             onClick={() => scrollProducts('left', refKey)}
           >
             <FaChevronLeft />
@@ -419,8 +419,8 @@ const NewArrivalsWish = () => {
           <Slider ref={getSliderRef(refKey)} {...sliderSettings} className="wish-products-row">
             {products.map(product => renderProductCard(product))}
           </Slider>
-          <button 
-            className="wish-scroll-button right" 
+          <button
+            className="wish-scroll-button right"
             onClick={() => scrollProducts('right', refKey)}
           >
             <FaChevronRight />
@@ -452,7 +452,7 @@ const NewArrivalsWish = () => {
       <div className="wish-logo-container">
         <img src={WishGenieLogo} alt="Wish Genie Logo" className="wish-genie-logo" />
       </div>
-      
+
       {/* Loading State */}
       {loading && (
         <div className="wish-loading-container">
@@ -467,7 +467,7 @@ const NewArrivalsWish = () => {
           <div className="wish-error-icon">⚠️</div>
           <h3 className="wish-error-title">Oops! Something went wrong</h3>
           <p className="wish-error-message">{error}</p>
-          <button 
+          <button
             className="wish-error-retry-btn"
             onClick={() => {
               setDataLoaded(false);
@@ -487,7 +487,7 @@ const NewArrivalsWish = () => {
             <div className="wish-intro-content">
               <h1 className="wish-title">Explore Our Manifestation Products</h1>
               <p className="wish-description">
-              Wishgenie specialises in high vibration manifestation tools designed to help you align with your highest potential. Whether you are seeking love, success, health, or peace , our carefully curated collection of products help and guide you towards your dreams.
+                Wishgenie specialises in high vibration manifestation tools designed to help you align with your highest potential. Whether you are seeking love, success, health, or peace , our carefully curated collection of products help and guide you towards your dreams.
               </p>
               <div className="wish-features">
                 <div className="wish-feature-item">
@@ -548,13 +548,13 @@ const NewArrivalsWish = () => {
                   )}
                 </div>
                 <div className="wish-featured-actions">
-                  <button 
+                  <button
                     className="wish-cart-btn"
                     onClick={(e) => handleAddToCart(featuredProduct, e)}
                   >
                     Add to Cart
                   </button>
-                  <button 
+                  <button
                     className={`wish-wishlist-btn ${isInWishlist(featuredProduct.id) ? 'active' : ''}`}
                     onClick={(e) => handleAddToWishlist(featuredProduct, e)}
                   >
@@ -651,7 +651,7 @@ const NewArrivalsWish = () => {
                 />
                 <button type="submit">Subscribe</button>
               </form>
-              {newsletterSuccess && <div style={{color: 'green', marginTop: 8}}>Subscribed successfully!</div>}
+              {newsletterSuccess && <div style={{ color: 'green', marginTop: 8 }}>Subscribed successfully!</div>}
             </div>
           </div>
         </>

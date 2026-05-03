@@ -7,6 +7,8 @@ import { ProductProvider } from './context/ProductContext.jsx';
 import { FilterProvider } from './context/FilterContext.jsx';
 import MainLayout from './components/MainLayout/MainLayout.jsx';
 
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 import Homepage from './Component/Homepage.jsx';
 import NewArrivals from './components/NewArrivals/NewArrivals.jsx';
 import AllProducts from './components/AllProducts/AllProducts.jsx';
@@ -51,6 +53,9 @@ import CartManagement from './components/Admin/CartManagement';
 import WishlistManagement from './components/Admin/WishlistManagement.jsx';
 import TestimonialsManagement from './components/Admin/TestimonialsManagement.jsx';
 import BlogDetail from './components/Blog/BlogDetail.jsx';
+import Checkout from './components/Checkout/Checkout.jsx';
+import BulkOrder from './pages/BulkOrder.jsx';
+import SocialMedia from './components/Admin/SocialMedia.jsx';
 import './App.css';
 
 const ProtectedRoute = ({ children }) => {
@@ -67,6 +72,8 @@ const AdminRoute = ({ children }) => {
   return children;
 };
 
+
+
 function App() {
   return (
     <GoogleOAuthProvider clientId="727732829380-un80uanpnh4rra3sfjr59a48et2rph38.apps.googleusercontent.com">
@@ -77,6 +84,7 @@ function App() {
               <WishlistProvider>
                 <Router>
                   <ScrollToTop />
+                  <ToastContainer position="bottom-right" autoClose={3000} />
                   <Routes>
                     <Route path="/" element={<MainLayout><Homepage /></MainLayout>} />
                     <Route path="/new-arrivals" element={<MainLayout><NewArrivals /></MainLayout>} />
@@ -86,7 +94,7 @@ function App() {
                     <Route path="/about" element={<MainLayout><About /></MainLayout>} />
                     <Route path="/product/:id" element={<MainLayout><ProductDetails /></MainLayout>} />
                     <Route path="/blog/:id" element={<MainLayout><BlogDetail /></MainLayout>} />
-                    <Route path="/category/:categoryName" element={<MainLayout><CategoryProducts /></MainLayout>} />
+                    <Route path="/category/:categoryName" element={<MainLayout><AllProducts /></MainLayout>} />
                     <Route path="/terms" element={<MainLayout><TermsAndConditions /></MainLayout>} />
                     <Route path="/privacy-policy" element={<MainLayout><PrivacyPolicy /></MainLayout>} />
                     <Route path="/track-order" element={<MainLayout><OrderTracking /></MainLayout>} />
@@ -98,6 +106,7 @@ function App() {
                     <Route path="/payment-success" element={<PaymentSuccess />} />
                     <Route path="/payment-failed" element={<PaymentFailed />} />
                     <Route path="/cart" element={<ProtectedRoute><Cart /></ProtectedRoute>} />
+                    <Route path="/checkout" element={<ProtectedRoute><Checkout /></ProtectedRoute>} />
                     <Route path="/wishlist" element={<ProtectedRoute><Wishlist /></ProtectedRoute>} />
                     <Route path="/profile" element={<ProtectedRoute><Profile /></ProtectedRoute>} />
                     <Route path="/my-orders" element={<ProtectedRoute><MyOrders /></ProtectedRoute>} />
@@ -107,6 +116,7 @@ function App() {
                     <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
                     <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
                     <Route path="/change-password" element={<MainLayout><ChangePassword /></MainLayout>} />
+                    <Route path="/bulk-order" element={<MainLayout><BulkOrder /></MainLayout>} />
                     <Route path="/admin" element={<AdminRoute><AdminDashboard /></AdminRoute>}>
                       <Route index element={<DashboardOverview />} />
                       <Route path="orders" element={<Orders />} />
@@ -120,8 +130,10 @@ function App() {
                       <Route path="cart-management" element={<CartManagement />} />
                       <Route path="wishlist-management" element={<WishlistManagement />} />
                       <Route path="testimonials" element={<TestimonialsManagement />} />
+                      <Route path="social-media" element={<SocialMedia />} />
                     </Route>
                     <Route path="/product-wish/:id" element={<MainLayout><ProductDetailWish /></MainLayout>} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>
                 </Router>
               </WishlistProvider>

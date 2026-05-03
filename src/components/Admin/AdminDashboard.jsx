@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Outlet, NavLink, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { FaUsers, FaShoppingCart, FaBox, FaList, FaChartLine, FaMoneyBillWave, FaTruck, FaStar, FaCalendarAlt, FaCreditCard, FaWallet, FaPaypal, FaHeart } from 'react-icons/fa';
+import { FaUsers, FaShoppingCart, FaBox, FaList, FaChartLine, FaMoneyBillWave, FaTruck, FaStar, FaCalendarAlt, FaCreditCard, FaWallet, FaPaypal, FaHeart, FaInstagram } from 'react-icons/fa';
 import { getDashboardStats } from '../../firebase/firestore';
 import './AdminDashboard.css';
 // Modern icons
@@ -228,6 +228,10 @@ const AdminDashboard = () => {
           <NavLink to="/admin/notifications" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
             <span className="nav-icon"><AiOutlineBell /></span>
             <span className="nav-text">Notifications</span>
+          </NavLink>
+          <NavLink to="/admin/social-media" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
+            <span className="nav-icon"><FaInstagram /></span>
+            <span className="nav-text">Social Media</span>
           </NavLink>
           <NavLink to="/admin/testimonials" className={({ isActive }) => 'nav-item' + (isActive ? ' active' : '')}>
             <span className="nav-icon"><FaStar /></span>

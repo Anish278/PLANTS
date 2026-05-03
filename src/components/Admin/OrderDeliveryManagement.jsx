@@ -894,7 +894,7 @@ const OrderDeliveryManagement = () => {
                       className="notification-btn sms"
                       onClick={() => sendDeliveryUpdateToCustomer(
                         selectedOrder.id, 
-                        `Fika: Your order #${selectedOrder.razorpay_order_id || selectedOrder.id.substring(0, 8)} is now ${selectedOrder.deliveryStatus}.`,
+                        `PlantVigor: Your order #${selectedOrder.razorpay_order_id || selectedOrder.id.substring(0, 8)} is now ${selectedOrder.deliveryStatus}.`,
                         'SMS'
                       )}
                     >

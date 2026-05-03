@@ -62,7 +62,7 @@ const OrderTracking = () => {
     <div className="order-tracking-page">
       <div className="order-tracking-hero">
         <h1>Track Your Order</h1>
-        <p>Enter your Order ID and Email to view the latest status and details of your Fika order.</p>
+        <p>Enter your Order ID and Email to view the latest status and details of your PlantVigor order.</p>
       </div>
       <div className="order-tracking-content">
         {!order ? (

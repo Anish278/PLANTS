@@ -56,8 +56,8 @@ const PaymentFormComponent = () => {
         amount: order.amount,
         currency: order.currency,
         order_id: order.id,
-        name: 'Fika App',
-        description: 'Payment for Fika App Services',
+        name: 'PlantVigor',
+        description: 'Payment for PlantVigor',
         handler: async (response) => {
           try {
             // Verify payment using Firebase Function

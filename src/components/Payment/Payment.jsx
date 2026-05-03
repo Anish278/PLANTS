@@ -314,7 +314,7 @@ const Payment = ({ onClose, total, promoCode = '', discount = 0 }) => {
         // Convert final total to paisa and ensure it's an integer
         amount: Math.round(finalTotal * 100),
         currency: orderResponse.currency,
-        name: "Fika App",
+        name: "PlantVigor",
         description: "Food Order Payment",
         order_id: orderResponse.id,
         callback_url: "https://us-central1-plants-fdacc.cloudfunctions.net/verifyPaymentCallback", // Add callback URL
@@ -542,7 +542,7 @@ const Payment = ({ onClose, total, promoCode = '', discount = 0 }) => {
           key: "rzp_live_oR04gue1fn6wcY", // Updated to production key
           amount: "10000", // 100 INR
           currency: "INR",
-          name: "Fika Test",
+          name: "PlantVigor Test",
           description: "Test Transaction",
           // No order_id needed for testing
           prefill: {

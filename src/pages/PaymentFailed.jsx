@@ -104,7 +104,7 @@ const PaymentFailed = () => {
           <h3>Need Help?</h3>
           <p>If you're experiencing issues with your payment, please contact our support team:</p>
           <ul>
-            <li>Email: support@fika.com</li>
+            <li>Email: support@plantvigor.com</li>
             <li>Phone: +91 1234567890</li>
           </ul>
         </div>

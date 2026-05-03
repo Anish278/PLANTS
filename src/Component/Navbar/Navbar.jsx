@@ -1,415 +1,294 @@
-import React, { useState, useRef, useEffect } from "react";
-import "./Navbar.css";
-import { FaSearch, FaShoppingCart, FaHeart, FaBars, FaTimes } from "react-icons/fa";
-import { FiShoppingBag } from "react-icons/fi";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { useCart } from "../../context/CartContext.jsx";
-import { useWishlist } from "../../context/WishlistContext.jsx";
-import UserDashboard from "../UserDashboard/UserDashboard";
-import { useAuthRedirect } from '../../utils/authUtils';
-import LoginPrompt from "../../components/LoginPrompt/LoginPrompt";
-import { db } from '../../firebase/config';
-import { collection, getDocs } from 'firebase/firestore';
+import React, { useState, useEffect } from "react";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import {
+  FaShoppingCart, FaSearch, FaUser, FaBars, FaTimes,
+  FaChevronDown, FaTruck, FaInstagram, FaFacebook, FaYoutube, FaTwitter
+} from "react-icons/fa";
+import { useCart } from "../../context/CartContext";
+import { useAuth } from "../../context/AuthContext";
+import AnnouncementBar from "./AnnouncementBar";
 
-function Navbar() {
-  const { getCartCount } = useCart();
-  const { wishlist } = useWishlist();
-  const [searchQuery, setSearchQuery] = useState("");
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [allProducts, setAllProducts] = useState([]);
-  const searchRef = useRef(null);
+const Navbar = () => {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
+  const [activeMenu, setActiveMenu] = useState(null);
+
+  const { cart } = useCart();
+  const { isAuthenticated, logout } = useAuth();
   const navigate = useNavigate();
-  const { requireAuth, showLoginPrompt, setShowLoginPrompt } = useAuthRedirect();
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [typingText, setTypingText] = useState("");
-  const [currentWordIndex, setCurrentWordIndex] = useState(0);
-  const [isDeleting, setIsDeleting] = useState(false);
-  const [typingSpeed, setTypingSpeed] = useState(1550);
-  const [promptMsg, setPromptMsg] = useState("");
-  const [showPrompt, setShowPrompt] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const location = useLocation();
+  const [searchQuery, setSearchQuery] = useState("");
 
-  // Check if screen is mobile
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth <= 480);
-    };
-    
-    checkMobile();
-    window.addEventListener('resize', checkMobile);
-    return () => window.removeEventListener('resize', checkMobile);
+    const handleScroll = () => setIsScrolled(window.scrollY > 50);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Fetch products from Firestore
   useEffect(() => {
-    const fetchProducts = async () => {
-      try {
-        const querySnapshot = await getDocs(collection(db, 'products'));
-        const products = [];
-        querySnapshot.forEach((doc) => {
-          products.push({ id: doc.id, ...doc.data() });
-        });
-        setAllProducts(products);
-      } catch (err) {
-        console.error('Error fetching products:', err);
-      }
-    };
-    fetchProducts();
-  }, []);
+    setIsMobileMenuOpen(false);
+    setShowSearch(false);
+    setActiveMenu(null);
+  }, [location]);
 
-  // Filter products based on search query
-  const filteredProducts = allProducts.filter(
-    (product) =>
-      searchQuery &&
-      (product.product_name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-       product.category?.toLowerCase().includes(searchQuery.toLowerCase()))
-  ).slice(0, 5); // Limit to 5 results
-
-  const words = ["Search Products","Explore Collections"];
-
-  useEffect(() => {
-    let timeout;
-    const currentWord = words[currentWordIndex];
-    
-    if (isDeleting) {
-      setTypingText(currentWord.substring(0, typingText.length - 1));
-      setTypingSpeed(1150);
-    } else {
-      setTypingText(currentWord.substring(0, typingText.length + 1));
-      setTypingSpeed(1150);
-    }
-
-    if (!isDeleting && typingText === currentWord) {
-      timeout = setTimeout(() => setIsDeleting(true), 2000);
-    } else if (isDeleting && typingText === "") {
-      setIsDeleting(false);
-      setCurrentWordIndex((prevIndex) => (prevIndex + 1) % words.length);
-    }
-
-    timeout = setTimeout(() => {
-      if (isDeleting) {
-        setTypingText(currentWord.substring(0, typingText.length - 1));
-      } else {
-        setTypingText(currentWord.substring(0, typingText.length + 1));
-      }
-    }, typingSpeed);
-
-    return () => clearTimeout(timeout);
-  }, [typingText, isDeleting, currentWordIndex]);
-
-  // Handle click outside to close dropdown and mobile menu
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (searchRef.current && !searchRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-    };
-  }, []);
-
-  // Close mobile menu when clicking on a link
-  const handleMobileNavClick = () => {
-    setIsMenuOpen(false);
-  };
-
-  const handleSearch = (e) => {
-    e.preventDefault();
-    if (searchQuery.trim()) {
-      navigate(`/all-products?search=${encodeURIComponent(searchQuery)}`);
-      setShowDropdown(false);
-      setSearchQuery("");
-      setIsSearchOpen(false);
-    }
-  };
-
-  const handleWishlistClick = (e) => {
-    e.preventDefault();
-    if (!requireAuth('view wishlist')) {
-      setShowLoginPrompt(true);
-      return;
-    }
-    navigate('/wishlist');
-    setIsMenuOpen(false);
-  };
-
-  const handleCartClick = (e) => {
-    e.preventDefault();
-    if (!requireAuth('view cart')) {
-      setShowLoginPrompt(true);
-      return;
-    }
-    navigate('/cart');
-    setIsMenuOpen(false);
-  };
-
-  const handleCloseLoginPrompt = () => {
-    setShowLoginPrompt(false);
-  };
-
-  const showActionPrompt = (msg) => {
-    setPromptMsg(msg);
-    setShowPrompt(true);
-    setTimeout(() => setShowPrompt(false), 2000);
-  };
-
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.detail && e.detail.msg) showActionPrompt(e.detail.msg);
-    };
-    window.addEventListener('show-action-prompt', handler);
-    return () => window.removeEventListener('show-action-prompt', handler);
-  }, []);
-
-  // Prevent body scroll when mobile menu is open
-  useEffect(() => {
-    if (isMenuOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = 'unset';
-    }
-    return () => {
-      document.body.style.overflow = 'unset';
-    };
-  }, [isMenuOpen]);
+  const menuItems = [
+    {
+      name: "Plants",
+      path: "/all-products",
+      dropdown: [
+        "Indoor Plants", "Succulent Plants", "Cactus", "Air Purifying Plants",
+        "Hardy Plants", "Adenium Plants", "Vastu Plants", "Medicinal Plants",
+        "House Plants", "Outdoor Plants", "Flowering Plants", "Summer Plants",
+        "Hanging Plants", "Plants for Bathroom", "Plants for Bedroom",
+        "Plants for Kitchen", "Plants for Office", "Oxygen Plants"
+      ]
+    },
+    {
+      name: "Seeds",
+      path: "/category/Seeds",
+      dropdown: ["Summer Seeds", "Winter Flower Seeds", "Fruit Seeds", "Herb Seeds"]
+    },
+    {
+      name: "Pots & Planters",
+      path: "/category/Pots",
+      dropdown: ["Resin Pots", "Metal Pots", "Coir Pots", "Self Watering Pots", "Plastic Pots", "Net Pots", "Ceramic Pots"]
+    },
+    {
+      name: "Plant Care",
+      path: "/category/Plant Care",
+      dropdown: ["Garden Tools", "Fertilizers & Soil", "Manures", "Self Watering Pots"]
+    },
+    {
+      name: "Accessories",
+      path: "/category/Accessories",
+      dropdown: ["Miniatures", "Pebbles", "Key chains"]
+    },
+    { name: "Combos", path: "/category/Combos" },
+    { name: "Our Story", path: "/about" },
+    { name: "Bulk Order", path: "/bulk-order" },
+    { name: "Track Order", path: "/track-order" },
+  ];
 
   return (
-    <>
-      <div className="navbar">
-        <div className="navbar-container">
-          {/* Mobile Hamburger Menu */}
-          {isMobile && (
-            <button 
-              className="mobile-menu-toggle" 
-              aria-label="Toggle menu"
-              onClick={() => setIsMenuOpen(!isMenuOpen)}
-            >
-              {isMenuOpen ? <FaTimes /> : <FaBars />}
-            </button>
-          )}
+    <header className="fixed top-0 left-0 right-0 z-50 transition-all duration-300">
+      <AnnouncementBar />
+
+      {/* Top Bar (Desktop Only) */}
+      <div className="hidden lg:flex bg-cream border-b border-gray-100 py-1.5 px-12 justify-between items-center text-[10px] font-bold text-primary/60 uppercase tracking-widest">
+        <div className="flex gap-4">
+          <FaFacebook className="hover:text-accent cursor-pointer transition-colors" />
+          <FaInstagram className="hover:text-accent cursor-pointer transition-colors" />
+          <FaYoutube className="hover:text-accent cursor-pointer transition-colors" />
+          <FaTwitter className="hover:text-accent cursor-pointer transition-colors" />
+        </div>
+        <div className="flex items-center gap-6">
+          <Link to="/track-order" className="hover:text-accent flex items-center gap-1.5"><FaTruck /> Track Your Order</Link>
+          <Link to="/contact" className="hover:text-accent">Support</Link>
+        </div>
+      </div>
+
+      {/* Main Navbar */}
+      <nav className={`transition-all duration-500 border-b ${isScrolled ? "bg-white/95 backdrop-blur-md py-4 shadow-xl border-gray-100" : "bg-white py-6 border-transparent"
+        }`}>
+        <div className="container mx-auto px-4 md:px-12 flex justify-between items-center">
+
+          {/* Logo */}
+          <Link to="/" className="flex items-center gap-2 md:gap-3 shrink-0 group">
+            <div className="relative">
+              <div className="w-8 h-8 md:w-10 md:h-10 bg-primary rounded-xl md:rounded-2xl rotate-12 group-hover:rotate-0 transition-transform duration-500 flex items-center justify-center text-white shadow-lg shadow-primary/20">
+                <span className="text-lg md:text-xl font-black">P</span>
+              </div>
+              <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-accent rounded-full border-2 border-white"></div>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-lg md:text-2xl font-display font-black text-primary leading-none tracking-tighter">PlantVigor</span>
+              <span className="text-[7px] md:text-[8px] font-black text-accent tracking-[0.4em] leading-none mt-1">NATURE'S BEST</span>
+            </div>
+          </Link>
 
           {/* Desktop Navigation Links */}
-          {!isMobile && (
-            <div className="navbar-left">
-              <NavLink to="/new-arrivals" className="nav-link">New Arrivals</NavLink>
-              <NavLink to="/all-products" className="nav-link">All Products</NavLink>
-              <NavLink to="/featured-stories" className="nav-link">Featured Stories</NavLink>
-              <NavLink to="/contact" className="nav-link">Contact Us</NavLink>
-            </div>
-          )}
-
-          <div className="navbar-center">
-            <Link to="/" className="logo" onClick={handleMobileNavClick}>
-              <img style={{width: "70px", height: "70px"}} src="/fika_page-001.webp" alt="logo" />
-            </Link>
-          </div>
-
-          <div className="navbar-right">
-            {/* Mobile Search Toggle */}
-            {isMobile && (
-              <button 
-                className="mobile-search-toggle"
-                onClick={() => setIsSearchOpen(!isSearchOpen)}
-                aria-label="Toggle search"
+          <div className="hidden lg:flex items-center gap-6">
+            {menuItems.map((item) => (
+              <div
+                key={item.name}
+                className="relative h-full py-2"
+                onMouseEnter={() => setActiveMenu(item.name)}
+                onMouseLeave={() => setActiveMenu(null)}
               >
-                <FaSearch />
-              </button>
-            )}
+                <Link
+                  to={item.path}
+                  className={`text-[11px] font-bold uppercase tracking-widest flex items-center gap-1.5 transition-all ${location.pathname === item.path ? "text-accent" : "text-primary hover:text-accent"
+                    }`}
+                >
+                  {item.name}
+                  {item.dropdown && <FaChevronDown size={8} className={`transition-transform duration-300 ${activeMenu === item.name ? "rotate-180" : ""}`} />}
+                </Link>
 
-            {/* Desktop Search Bar */}
-            {!isMobile && (
-              <div className="search-bar" ref={searchRef}>
-                <form onSubmit={handleSearch}>
-                  <input 
-                    type="text" 
-                    placeholder={typingText}
-                    value={searchQuery}
-                    onChange={(e) => {
-                      setSearchQuery(e.target.value);
-                      setShowDropdown(true);
-                    }}
-                    onFocus={() => {
-                      if (searchQuery) setShowDropdown(true);
-                    }}
-                  />
-                  <button type="submit" className="search-btn">
-                    <FaSearch size={14} />
-                  </button>
-                </form>
-
-                {/* Search Results Dropdown */}
-                {showDropdown && searchQuery && (
-                  <div className="search-results-dropdown">
-                    {filteredProducts.map((product) => (
-                      <div 
-                        key={product.id} 
-                        className="search-result-item"
-                        onClick={() => {
-                          navigate(`/product/${product.id}`);
-                          setShowDropdown(false);
-                          setSearchQuery("");
-                        }}
-                      >
-                        <img 
-                          src={product.image ? '/' + product.image.split(',')[0].trim() : ''} 
-                          alt={product.name} 
-                          className="search-result-image" 
-                        />
-                        <div className="search-result-info">
-                          <div className="search-result-name">{product.product_name}</div>
-                          <div className="search-result-price">₹{product.mrp}</div>
-                        </div>
+                {item.dropdown && activeMenu === item.name && (
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 pt-6 animate-fade-in z-50">
+                    <div className="bg-white rounded-3xl shadow-2xl border border-gray-100 py-6 min-w-[240px] overflow-hidden">
+                      <div className="max-h-[60vh] overflow-y-auto px-4 scrollbar-hide">
+                        {item.dropdown.map(sub => (
+                          <Link
+                            key={sub}
+                            to={`/category/${sub}`}
+                            className="block px-6 py-3 text-[10px] font-bold text-gray-400 hover:text-primary hover:bg-cream rounded-xl transition-all uppercase tracking-widest"
+                          >
+                            {sub}
+                          </Link>
+                        ))}
                       </div>
-                    ))}
-                    
-                    {filteredProducts.length === 0 && (
-                      <div className="no-results">No products found</div>
-                    )}
+                    </div>
                   </div>
                 )}
               </div>
-            )}
+            ))}
+          </div>
 
-            <span className="icon-wrapper">
-              <Link to="/wishlist" className="" aria-label="Wishlist" onClick={handleWishlistClick}>
-                <FaHeart style={{ color: '#333' }} />
-                {wishlist.length > 0 && (
-                  <span className="badge wishlist-badge">{wishlist.length}</span>
+          {/* Right Action Icons */}
+          <div className="flex items-center gap-1 md:gap-4">
+            <button
+              onClick={() => setShowSearch(true)}
+              className="p-2 text-primary hover:text-accent transition-all relative group"
+            >
+              <FaSearch size={18} />
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-accent transition-all group-hover:w-full"></span>
+            </button>
+
+            <Link to={isAuthenticated ? "/profile" : "/login"} className="p-2 text-primary hover:text-accent transition-all relative group hidden md:block">
+              <FaUser size={18} />
+              <span className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-accent transition-all group-hover:w-full"></span>
+            </Link>
+
+            <Link to="/cart" className="p-2 text-primary hover:text-accent transition-all relative group">
+              <div className="relative">
+                <FaShoppingCart size={18} />
+                {cart.length > 0 && (
+                  <span className="absolute -top-2 -right-2 bg-accent text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center shadow-lg border border-white">
+                    {cart.length}
+                  </span>
                 )}
-              </Link>
-            </span>
-            <span className="icon-wrapper">
-              <Link to="/cart" className="" aria-label="Shopping Cart" onClick={handleCartClick}>
-                <FiShoppingBag style={{ color: '#333' }} />
-                {getCartCount() > 0 && (
-                  <span className="badge cart-badge">{getCartCount()}</span>
-                )}
-              </Link>
-            </span>
-            <UserDashboard />
+              </div>
+            </Link>
+
+            <button
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-2 text-primary hover:text-accent transition-all"
+            >
+              <FaBars size={24} />
+            </button>
           </div>
         </div>
+      </nav>
 
-        {/* Mobile Search Bar */}
-        {isMobile && isSearchOpen && (
-          <div className="mobile-search-container">
-            <button 
-              className="mobile-search-close"
-              onClick={() => {
-                setIsSearchOpen(false);
-                setSearchQuery("");
-                setShowDropdown(false);
-              }}
-              aria-label="Close search"
-            >
-              <FaTimes />
-            </button>
-            <div className="search-bar mobile-search" ref={searchRef}>
-              <form onSubmit={handleSearch}>
-                <input 
-                  type="text" 
-                  placeholder="Search products..."
-                  value={searchQuery}
-                  onChange={(e) => {
-                    setSearchQuery(e.target.value);
-                    setShowDropdown(true);
-                  }}
-                  onFocus={() => {
-                    if (searchQuery) setShowDropdown(true);
-                  }}
-                  autoFocus
-                />
-                <button type="submit" className="search-btn">
-                  <FaSearch size={14} />
+      {/* Search Overlay */}
+      {showSearch && (
+        <div className="fixed inset-0 bg-primary/95 backdrop-blur-xl z-[100] animate-fade-in flex flex-col p-8 md:p-24">
+          <button
+            onClick={() => setShowSearch(false)}
+            className="absolute top-12 right-12 text-white/40 hover:text-white transition-all hover:rotate-90 duration-500"
+          >
+            <FaTimes size={40} />
+          </button>
+
+          <div className="max-w-4xl mx-auto w-full mt-24">
+            <span className="text-accent font-bold text-xs uppercase tracking-[0.4em] mb-4 block underline decoration-accent underline-offset-8">Quick Search</span>
+            <h2 className="text-4xl md:text-7xl font-display font-black text-white mb-12 tracking-tighter leading-none">
+              Looking for <br /> <span className="text-accent">Something Green?</span>
+            </h2>
+            <div className="relative group">
+              <input
+                autoFocus
+                type="text"
+                placeholder="Type your search here..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && searchQuery.trim()) {
+                    navigate(`/all-products?search=${searchQuery.trim()}`);
+                    setShowSearch(false);
+                  }
+                }}
+                className="w-full bg-transparent border-b-4 border-white/20 text-3xl md:text-5xl py-8 font-display font-medium text-white placeholder:text-white/10 focus:outline-none focus:border-accent transition-all"
+              />
+              <button
+                onClick={() => {
+                  if (searchQuery.trim()) {
+                    navigate(`/all-products?search=${searchQuery.trim()}`);
+                    setShowSearch(false);
+                  }
+                }}
+                className="absolute right-0 top-1/2 -translate-y-1/2 text-white/20 group-focus-within:text-accent transition-all hover:scale-110"
+              >
+                <FaSearch size={40} />
+              </button>
+            </div>
+
+            <div className="mt-16 flex flex-wrap gap-4">
+              <span className="text-[10px] font-black text-white/20 uppercase tracking-[0.3em] w-full mb-4">Popular Collection</span>
+              {["Snake Plants", "Air Purifiers", "Pots & Tools", "Best Sellers"].map(tag => (
+                <button key={tag} className="px-8 py-4 bg-white/5 hover:bg-accent text-white rounded-2xl text-xs font-bold transition-all border border-white/10 hover:border-accent uppercase tracking-widest">
+                  {tag}
                 </button>
-              </form>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
 
-              {/* Mobile Search Results Dropdown */}
-              {showDropdown && searchQuery && (
-                <div className="search-results-dropdown mobile-search-dropdown">
-                  {filteredProducts.map((product) => (
-                    <div 
-                      key={product.id} 
-                      className="search-result-item"
-                      onClick={() => {
-                        navigate(`/product/${product.id}`);
-                        setShowDropdown(false);
-                        setSearchQuery("");
-                        setIsSearchOpen(false);
-                      }}
-                    >
-                      <img 
-                        src={product.image ? '/' + product.image.split(',')[0].trim() : ''} 
-                        alt={product.name} 
-                        className="search-result-image" 
-                      />
-                      <div className="search-result-info">
-                        <div className="search-result-name">{product.product_name}</div>
-                        <div className="search-result-price">₹{product.mrp}</div>
-                      </div>
+      {/* Mobile Sidebar Navigation */}
+      <div className={`fixed inset-0 bg-primary/80 backdrop-blur-md z-[110] transition-opacity duration-500 ${isMobileMenuOpen ? "opacity-100 visible" : "opacity-0 invisible"}`}>
+        <div className={`absolute top-0 right-0 bottom-0 w-[85%] max-w-sm bg-white transition-transform duration-500 shadow-2xl ${isMobileMenuOpen ? "translate-x-0" : "translate-x-full"}`}>
+          <div className="p-10 flex flex-col h-full overflow-y-auto">
+            <div className="flex justify-between items-center mb-16 border-b border-gray-100 pb-6">
+              <span className="text-2xl font-display font-black text-primary tracking-tighter uppercase">Menu</span>
+              <button onClick={() => setIsMobileMenuOpen(false)} className="w-10 h-10 rounded-full bg-gray-50 flex items-center justify-center text-primary">
+                <FaTimes size={20} />
+              </button>
+            </div>
+
+            <div className="flex flex-col gap-8">
+              {menuItems.map((item) => (
+                <div key={item.name} className="flex flex-col gap-4">
+                  <Link
+                    to={item.path}
+                    className="text-xl font-display font-black text-primary hover:text-accent transition-all uppercase tracking-tight flex items-center justify-between"
+                  >
+                    {item.name}
+                    {item.dropdown && <FaChevronDown size={12} className="text-gray-300" />}
+                  </Link>
+                  {item.dropdown && (
+                    <div className="flex flex-wrap gap-2 pl-4">
+                      {item.dropdown.slice(0, 6).map(sub => (
+                        <Link key={sub} to={`/category/${sub}`} className="text-[10px] font-bold text-gray-400 hover:text-accent border border-gray-100 px-3 py-1.5 rounded-lg uppercase tracking-widest">
+                          {sub}
+                        </Link>
+                      ))}
+                      {item.dropdown.length > 6 && <span className="text-[10px] font-bold text-gray-300 italic">+{item.dropdown.length - 6} more...</span>}
                     </div>
-                  ))}
-                  
-                  {filteredProducts.length === 0 && (
-                    <div className="no-results">No products found</div>
                   )}
                 </div>
-              )}
+              ))}
             </div>
-          </div>
-        )}
 
-        {/* Mobile Menu Overlay */}
-        {isMobile && isMenuOpen && (
-          <div className="mobile-menu-overlay" onClick={() => setIsMenuOpen(false)}>
-            <div className="mobile-menu-content" onClick={(e) => e.stopPropagation()}>
-              <div className="mobile-menu-header">
-                <h3>Menu</h3>
-                <button 
-                  className="mobile-menu-close"
-                  onClick={() => setIsMenuOpen(false)}
-                  aria-label="Close menu"
-                >
-                  <FaTimes />
-                </button>
+            <div className="mt-auto pt-10 border-t border-gray-100 flex flex-col gap-8">
+              <Link to="/track-order" className="flex items-center gap-4 text-primary font-black uppercase text-xs tracking-widest">
+                <FaTruck className="text-accent" /> Track Your Order
+              </Link>
+              <div className="flex gap-4">
+                {[FaFacebook, FaInstagram, FaYoutube, FaTwitter].map((Icon, i) => (
+                  <div key={i} className="w-12 h-12 rounded-2xl bg-gray-50 flex items-center justify-center text-primary hover:bg-accent hover:text-white transition-all cursor-pointer shadow-sm">
+                    <Icon />
+                  </div>
+                ))}
               </div>
-              <nav className="mobile-nav">
-                <NavLink to="/new-arrivals" className="mobile-nav-link" onClick={handleMobileNavClick}>
-                  New Arrivals
-                </NavLink>
-                <NavLink to="/all-products" className="mobile-nav-link" onClick={handleMobileNavClick}>
-                  All Products
-                </NavLink>
-                <NavLink to="/featured-stories" className="mobile-nav-link" onClick={handleMobileNavClick}>
-                  Featured Stories
-                </NavLink>
-                <NavLink to="/contact" className="mobile-nav-link" onClick={handleMobileNavClick}>
-                  Contact Us
-                </NavLink>
-              </nav>
             </div>
           </div>
-        )}
+        </div>
       </div>
-      
-      {showLoginPrompt && (
-        <div className="login-prompt-overlay" onClick={handleCloseLoginPrompt}>
-          <div className="login-prompt-wrapper" onClick={(e) => e.stopPropagation()}>
-            <LoginPrompt message="Please login to access your cart and wishlist items." />
-          </div>
-        </div>
-      )}
-      {showPrompt && (
-        <div className="action-prompt">
-          {promptMsg}
-        </div>
-      )}
-    </>
+    </header>
   );
-}
+};
 
 export default Navbar;

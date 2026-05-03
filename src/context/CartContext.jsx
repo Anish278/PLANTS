@@ -32,27 +32,16 @@ export const CartProvider = ({ children }) => {
   // Listen for auth state changes
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(async (user) => {
-      console.log('Auth state changed:', user?.email);
       if (user) {
         try {
           setLoading(true);
-          // Get the active cart using firestore.js function
           const activeCart = await getActiveCart(user.email);
-          console.log('Active cart result:', activeCart);
-          
           if (activeCart) {
-            // User has an active cart
-            console.log('Found existing cart:', activeCart);
             setCart(activeCart.items || []);
             setCartId(activeCart.id);
-            
-            // Initially select all items
             setSelectedItems(activeCart.items || []);
           } else {
-            // Create new cart document if it doesn't exist
-            console.log('No active cart found, creating new cart');
             const newCart = await createActiveCart(user.email);
-            console.log('Created new cart:', newCart);
             setCart([]);
             setSelectedItems([]);
             setCartId(newCart.id);
@@ -65,7 +54,6 @@ export const CartProvider = ({ children }) => {
           setLoading(false);
         }
       } else {
-        console.log('No user, clearing cart state');
         setCart([]);
         setSelectedItems([]);
         setCartId(null);
@@ -76,31 +64,15 @@ export const CartProvider = ({ children }) => {
     return () => unsubscribe();
   }, []);
 
+
   // Save cart to Firestore
   const saveCartToFirestore = async (newCart) => {
     const user = auth.currentUser;
-    if (!user?.email || !cartId) {
-      console.log('Cannot save to Firestore: Missing user email or cartId', {
-        userEmail: user?.email,
-        cartId
-      });
-      return;
-    }
+    if (!user?.email || !cartId) return;
 
     try {
-      console.log('Saving to Firestore:', {
-        cartId,
-        userEmail: user.email,
-        cartItems: newCart.length
-      });
-
-      // Update the active cart
       await updateCart(cartId, newCart);
-      console.log('Successfully updated cart in Firestore');
-      
-      // Also save cart as a "saved cart" for historical reference
       await saveCartHistory(user.email, newCart);
-      console.log('Successfully saved cart history');
     } catch (error) {
       console.error('Error saving cart to Firestore:', error);
       throw error;
@@ -109,75 +81,67 @@ export const CartProvider = ({ children }) => {
 
   const addToCart = async (product, size = "default", quantity = 1, navigate) => {
     const user = auth.currentUser;
-    console.log('CartContext: Starting addToCart with:', {
-      product,
-      size,
-      quantity,
-      userEmail: user?.email,
-      cartId
-    });
     
     if (!user) {
-      console.log('CartContext: No authenticated user found');
-      if (navigate) {
-        navigate('/login');
-      }
+      if (navigate) navigate('/login');
+      return;
+    }
+
+    if (!product || !product.id) {
+      console.error('CartContext: Invalid product data:', product);
       return;
     }
     
-    if (!cartId) {
-      console.log('CartContext: No cartId found, creating new cart');
+    // Get or create cartId — use local variable to avoid stale state
+    let activeCartId = cartId;
+    if (!activeCartId) {
       try {
         const newCart = await createActiveCart(user.email);
-        setCartId(newCart.id);
+        activeCartId = newCart.id;
+        setCartId(activeCartId);
       } catch (error) {
         console.error('CartContext: Error creating new cart:', error);
         return;
       }
     }
     
-    if (!product || !product.id) {
-      console.error('CartContext: Invalid product data:', product);
-      return;
-    }
-
     try {
-      // Update the cart state
       const newCart = [...cart];
       const existingItemIndex = newCart.findIndex(
-        item => item.id === product.id && item.size === size
+        item => item.id === product.id && item.size === (size || 'default')
       );
       
       if (existingItemIndex >= 0) {
-        // Update existing item
         newCart[existingItemIndex].quantity += quantity;
       } else {
-        // Add new item
-        const newItem = {
+        // Build item and strip undefined/null so Firestore doesn't reject it
+        const rawItem = {
           id: product.id,
-          name: product.name || product.product_name,
-          price: product.price || product.mrp,
-          discount: product.discount || 0,
-          image: product.image || '/placeholder-image.jpg',
-          category: product.category,
-          size: size,
+          name: product.name || product.product_name || '',
+          price: Number(product.price || product.mrp || 0),
+          discount: Number(product.discount || 0),
+          image: product.image || product.imageUrls?.[0] || '',
+          category: product.category || '',
+          size: size || 'default',
           quantity: quantity || 1,
           color: product.color || 'Default',
           selected: true,
-          addedAt: new Date().toISOString()
+          addedAt: new Date().toISOString(),
+          ...(product.discountPrice ? { discountPrice: Number(product.discountPrice) } : {})
         };
+        const newItem = Object.fromEntries(
+          Object.entries(rawItem).filter(([, v]) => v !== undefined && v !== null)
+        );
         newCart.push(newItem);
-        
-        // Also add to selected items
         setSelectedItems(prev => [...prev, newItem]);
       }
       
-      // Update state
       setCart(newCart);
+      // Use activeCartId (local var) not cartId (stale state)
+      await updateCart(activeCartId, newCart);
+      await saveCartHistory(user.email, newCart);
       
-      // Save to Firestore
-      await saveCartToFirestore(newCart);
-      console.log('CartContext: Successfully added item to cart');
+      if (navigate) navigate('/cart');
     } catch (error) {
       console.error('CartContext: Error in addToCart:', error);
       throw error;
@@ -261,18 +225,18 @@ export const CartProvider = ({ children }) => {
   const getCartTotal = () => {
     return cart.reduce((total, item) => {
       const price = item.discount
-        ? item.price * (1 - item.discount / 100)
-        : item.price;
-      return total + price * item.quantity;
+        ? Number(item.price || 0) * (1 - Number(item.discount || 0) / 100)
+        : Number(item.price || 0);
+      return total + price * Number(item.quantity || 1);
     }, 0);
   };
 
   const getSelectedItemsTotal = () => {
     return selectedItems.reduce((total, item) => {
       const price = item.discount
-        ? item.price * (1 - item.discount / 100)
-        : item.price;
-      return total + price * item.quantity;
+        ? Number(item.price || 0) * (1 - Number(item.discount || 0) / 100)
+        : Number(item.price || 0);
+      return total + price * Number(item.quantity || 1);
     }, 0);
   };
 

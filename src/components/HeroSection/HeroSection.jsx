@@ -22,7 +22,7 @@ const HeroSection = () => {
             </h1>
             <p>
               Elevate Your Style With Our Fashion Finds. Discover Your Signature
-              Style At Fika.
+              Style At PlantVigor.
             </p>
           </div>
           {/* Buttons in the center */}

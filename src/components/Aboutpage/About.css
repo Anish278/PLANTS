@@ -1,14 +1,13 @@
 .about-page {
-  width: 100%;
-  background-color: #fff;
-  margin-top: 10%;
+  background-color: #fdfbf7;
+  overflow-x: hidden;
 }
 
-/* About Banner Section */
+/* Banner Section */
 .about-banner-section {
-  width: 100%;
-  height: 80vh;
   position: relative;
+  height: 80vh;
+  width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -20,7 +19,7 @@
   top: 0;
   left: 0;
   width: 100%;
-  height: 70%;
+  height: 100%;
   z-index: 1;
 }
 
@@ -32,12 +31,13 @@
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  transition: opacity 1s ease-in-out;
-  filter: blur(3px);
+  transition: opacity 1.5s ease-in-out, transform 8s linear;
+  transform: scale(1.1);
 }
 
 .slider-image.active {
   opacity: 1;
+  transform: scale(1);
 }
 
 .slider-overlay {
@@ -46,7 +46,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0, 0, 0, 0.4);
+  background: linear-gradient(to bottom, rgba(0,0,0,0.6), rgba(0,0,0,0.3), rgba(0,0,0,0.6));
   z-index: 2;
 }
 
@@ -54,341 +54,258 @@
   position: relative;
   z-index: 3;
   text-align: center;
-  width: 100%;
+  color: white;
+  max-width: 900px;
   padding: 0 20px;
-  margin-top: -100px;
 }
 
-@keyframes glowingText {
-  0% {
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
-                 0 0 20px rgba(255, 255, 255, 0.8),
-                 0 0 30px rgba(255, 255, 255, 0.8);
-  }
-  50% {
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8),
-                 0 0 30px rgba(255, 255, 255, 0.8),
-                 0 0 40px rgba(255, 255, 255, 0.8);
-  }
-  100% {
-    text-shadow: 0 0 10px rgba(255, 255, 255, 0.8),
-                 0 0 20px rgba(255, 255, 255, 0.8),
-                 0 0 30px rgba(255, 255, 255, 0.8);
-  }
-}
-
-@keyframes splitLetter {
-  0%, 100% { transform: translateY(0) rotate(0); opacity: 1; }
-  50% { transform: translateY(-20px) rotate(5deg); opacity: 0.5; }
-}
-
-.about-banner-content h1 {
-  font-size: 5rem;
-  font-weight: 700;
-  color: #fff;
-  margin: 0;
-  margin-bottom: 1rem;
-  font-family: 'Montserrat', sans-serif;
-  letter-spacing: 0.1em;
+.subtitle {
+  display: block;
+  font-size: 14px;
+  font-weight: 800;
   text-transform: uppercase;
-  margin-top: -150px;
-  display: flex;
-  justify-content: center;
-  overflow: hidden;
-  flex-wrap: wrap;
+  letter-spacing: 0.5em;
+  margin-bottom: 20px;
+  color: #a18aff;
+  animation: fadeInDown 1s ease-out;
 }
 
-.about-banner-content h1 span {
+.title-container h1 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(3rem, 10vw, 6rem);
+  font-weight: 900;
+  line-height: 1;
+  margin-bottom: 30px;
+  letter-spacing: -0.02em;
+}
+
+.title-container h1 span {
   display: inline-block;
-  animation: splitLetter 2s ease-in-out infinite;
-  animation-play-state: paused;
-  transition: transform 0.3s ease;
-}
-
-.about-banner-content h1:hover span {
-  animation-play-state: running;
-}
-
-.about-banner-content h1 span:nth-child(2n) {
-  animation-delay: 0.1s;
-}
-
-.about-banner-content h1 span:nth-child(3n) {
-  animation-delay: 0.2s;
-}
-
-.about-banner-content h1 span:nth-child(4n) {
-  animation-delay: 0.3s;
-}
-
-.about-banner-content h1 span:nth-child(5n) {
-  animation-delay: 0.4s;
+  opacity: 0;
+  transform: translateY(30px);
+  animation: fadeInUp 0.8s ease-out forwards;
 }
 
 .about-banner-description {
-  color: #fff;
-  font-size: 1.2rem;
-  font-family: 'Montserrat', sans-serif;
-  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  opacity: 0.95;
-  letter-spacing: 0.05em;
-  margin: 0;
-  animation: glowingText 3s ease-in-out infinite;
-}
-
-.subtitle-separator {
-  font-size: 0.5rem;
-  opacity: 0.7;
-  margin-top: 3px;
+  font-size: 18px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.8);
+  letter-spacing: 0.1em;
+  animation: fadeIn 1.5s ease-out 0.5s forwards;
+  opacity: 0;
 }
 
 .slider-dots {
   position: absolute;
-  bottom: 2rem;
+  bottom: 40px;
   left: 50%;
   transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
   z-index: 3;
+  display: flex;
+  gap: 15px;
 }
 
 .slider-dot {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.3);
   cursor: pointer;
   transition: all 0.3s ease;
+  border: 1px solid white;
 }
 
 .slider-dot.active {
-  background: #fff;
-  transform: scale(1.2);
+  background: white;
+  transform: scale(1.3);
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+}
+
+/* Philosophy Section */
+.philosophy-section {
+  padding: 100px 0;
+  background: white;
+}
+
+.philosophy-card {
+  padding: 40px 20px;
+  transition: transform 0.4s ease;
+}
+
+.philosophy-card:hover {
+  transform: translateY(-10px);
+}
+
+.icon-box {
+  width: 80px;
+  height: 80px;
+  background: #f0f7f0;
+  color: #2E7D32;
+  border-radius: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+  margin: 0 auto 25px;
+  transition: all 0.4s ease;
+}
+
+.philosophy-card:hover .icon-box {
+  background: #2E7D32;
+  color: white;
+  rotate: 12deg;
+}
+
+.philosophy-card h3 {
+  font-size: 18px;
+  font-weight: 800;
+  color: #1a3a1a;
+  margin-bottom: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.philosophy-card p {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.6;
 }
 
 /* Content Section */
 .about-content-section {
-  background-color: #fff;
-  padding: 6rem 0;
+  padding: 120px 0;
+  background: #fdfbf7;
 }
 
 .content-container {
-  max-width: 1000px;
+  max-width: 1200px;
   margin: 0 auto;
-  padding: 0 2rem;
+  padding: 0 20px;
 }
 
-.about-description {
-  text-align: left;
-  max-width: 800px;
-  margin: 0 auto;
-  margin-top: -250px;
+.about-grid {
+  display: grid;
+  grid-template-cols: 1.2fr 0.8fr;
+  gap: 80px;
+  align-items: center;
 }
 
-.about-description p {
-  font-size: 1.2rem;
+.section-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 48px;
+  font-weight: 900;
+  margin-bottom: 40px;
+  line-height: 1.1;
+  letter-spacing: -0.01em;
+}
+
+.about-text p {
+  font-size: 18px;
   line-height: 1.8;
-  color: #333;
-  margin-bottom: 2rem;
-  font-family: 'Montserrat', sans-serif;
+  color: #4a4a4a;
+  margin-bottom: 25px;
 }
 
 .tagline {
-  font-size: 1.4rem !important;
-  color: #1D1D1D !important;
-  text-align: center !important;
+  font-family: 'Playfair Display', serif;
+  font-size: 24px;
   font-style: italic;
-  margin-top: 3rem !important;
-  font-weight: 500;
+  font-weight: 700;
+  color: #2E7D32;
+  margin-top: 50px;
+  position: relative;
+  padding-left: 30px;
 }
 
-/* Enhanced Media Queries for Better Responsiveness */
-@media (max-width: 1024px) {
-  .about-banner-section {
-    height: 70vh;
-  }
+.tagline::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 20px;
+  height: 2px;
+  background: #2E7D32;
+}
 
-  .about-banner-content h1 {
-    font-size: 4rem;
-    margin-top: -120px;
-  }
+.about-image img {
+  width: 100%;
+  height: 600px;
+  object-fit: cover;
+  transition: transform 1s ease;
+}
 
-  .about-banner-description {
-    font-size: 1.1rem;
-  }
+.about-image:hover img {
+  transform: scale(1.05);
+}
 
-  .about-description {
-    margin-top: -200px;
+/* Animations */
+@keyframes fadeInUp {
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fadeIn {
+  to { opacity: 1; }
 }
 
 @media (max-width: 768px) {
-  .about-page {
-    margin-top: 8%;
-  }
-
-  .about-banner-section {
-    height: 60vh;
-  }
-
-  .about-banner-content {
-    padding: 0 15px;
-    margin-top: -80px;
-  }
-
-  .about-banner-content h1 {
-    font-size: 3rem;
-    margin-top: -100px;
-    letter-spacing: 0.05em;
-    flex-wrap: wrap;
-    justify-content: center;
-  }
-
-  .about-banner-description {
-    font-size: 1rem;
-    padding: 0 10px;
-  }
-
-  .slider-dots {
-    bottom: 1.5rem;
-  }
-
-  .slider-dot {
-    width: 10px;
-    height: 10px;
-  }
-
-  .about-content-section {
-    padding: 4rem 0;
-  }
-
-  .content-container {
-    padding: 0 1.5rem;
-  }
-
-  .about-description {
-    margin-top: -150px;
-  }
-
-  .about-description p {
-    font-size: 1.1rem;
-    line-height: 1.6;
-  }
-
-  .tagline {
-    font-size: 1.2rem !important;
-    margin-top: 2rem !important;
-  }
-}
-
-@media (max-width: 480px) {
-  .about-page {
-    margin-top: 20%;
+  .about-grid {
+    grid-template-cols: 1fr;
+    gap: 50px;
   }
   
-  .about-banner-section {
-    height: 50vh;
-    border-radius: 20px;
+  .about-image img {
+    height: 400px;
   }
-
-  .about-banner-content {
-    padding: 0 10px;
-    margin-top: -60px;
-  }
-
-  .about-banner-content h1 {
-    font-size: 2.2rem;
-    margin-top: -80px;
-    letter-spacing: 0.03em;
-    line-height: 1.2;
-  }
-
-  .about-banner-description {
-    font-size: 0.9rem;
-    padding: 0 5px;
-  }
-
-  .slider-dots {
-    bottom: 1rem;
-    gap: 8px;
-  }
-
-  .slider-dot {
-    width: 8px;
-    height: 8px;
-  }
-
-  .about-content-section {
-    padding: 0;
-  }
-
-  .content-container {
-    padding: 0 1rem;
-  }
-
-  .about-description {
-    margin-top: -100px;
-  }
-
-  .about-description p {
-    font-size: 1rem;
-    line-height: 1.5;
-    margin-bottom: 1.5rem;
-  }
-
-  .tagline {
-    font-size: 1.1rem !important;
-    margin-top: 1.5rem !important;
+  
+  .section-title {
+    font-size: 36px;
   }
 }
 
-@media (max-width: 360px) {
-  .about-page {
-    margin-top: 15%;
-  }
-
-  .about-banner-section {
-    height: 45vh;
-  }
-
-  .about-banner-content h1 {
-    font-size: 1.8rem;
-    margin-top: -60px;
-  }
-
-  .about-banner-description {
-    font-size: 0.8rem;
-  }
-
-  .about-description {
-    margin-top: -80px;
-  }
-
-  .about-description p {
-    font-size: 0.95rem;
-  }
-
-  .tagline {
-    font-size: 1rem !important;
-  }
+/* Botanical Stories Styles */
+.about-blog-section {
+  position: relative;
+  overflow: hidden;
 }
 
-/* Landscape orientation adjustments for mobile */
-@media (max-width: 768px) and (orientation: landscape) {
-  .about-banner-section {
-    height: 80vh;
-  }
+.about-blog-card {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
 
-  .about-banner-content h1 {
-    font-size: 2.5rem;
-    margin-top: -60px;
-  }
+.about-blog-card:hover {
+  transform: translateY(-15px);
+}
 
-  .about-banner-description {
-    font-size: 0.9rem;
-  }
+.about-blog-image::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.4), transparent);
+  opacity: 0;
+  transition: opacity 0.5s ease;
+}
 
-  .about-description {
-    margin-top: -120px;
-  }
+.about-blog-card:hover .about-blog-image::after {
+  opacity: 1;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }

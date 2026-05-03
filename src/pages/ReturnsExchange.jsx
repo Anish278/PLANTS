@@ -27,11 +27,11 @@ const faqs = [
   },
   {
     q: 'How do I initiate a return?',
-    a: 'If you are unsatisfied with the product delivered, you need to mail us at info@fika-india.com within 2 days from the date of receiving the parcel or register a return pickup from the "exchange & return" tab on the home page.'
+    a: 'If you are unsatisfied with the product delivered, you need to mail us at info@plantvigor.com within 2 days from the date of receiving the parcel or register a return pickup from the "exchange & return" tab on the home page.'
   },
   {
     q: 'What are the refund options available?',
-    a: 'We offer two options: 1) Store Credit - added to your FIKA Account for future purchases, or 2) Bank Refund - after deducting one side shipping charges (requires bank details).'
+    a: 'We offer two options: 1) Store Credit - added to your PlantVigor Account for future purchases, or 2) Bank Refund - after deducting one side shipping charges (requires bank details).'
   },
   {
     q: 'Can I return discounted products?',
@@ -100,7 +100,7 @@ const ReturnsExchange = () => {
   const Stepper = () => (
     <div className="returns-stepper">
       {steps.map((label, idx) => (
-        <div key={label} className={`stepper-step${step === idx ? ' active' : ''}${step > idx ? ' done' : ''}`}> 
+        <div key={label} className={`stepper-step${step === idx ? ' active' : ''}${step > idx ? ' done' : ''}`}>
           <div className="stepper-circle">{idx + 1}</div>
           <div className="stepper-label">{label}</div>
         </div>
@@ -155,7 +155,7 @@ const ReturnsExchange = () => {
     <div className="returns-exchange-page">
       <div className="returns-hero">
         <h1>Returns & Exchange</h1>
-        <p>We want you to love your Fika purchase! If something isn't right, our advanced returns and exchange process is here to help.</p>
+        <p>We want you to love your PlantVigor purchase! If something isn't right, our advanced returns and exchange process is here to help.</p>
       </div>
       <div className="returns-content advanced">
         <div className="returns-main">
@@ -175,9 +175,9 @@ const ReturnsExchange = () => {
                 <label htmlFor="phone">Phone Number</label>
                 <input type="tel" id="phone" name="phone" value={form.phone} onChange={handleChange} required pattern="[0-9]{10}" placeholder="10-digit mobile number" />
               </div>
-              {lookupError && <div className="error-message" style={{color:'red',marginBottom:'10px'}}>{lookupError}</div>}
+              {lookupError && <div className="error-message" style={{ color: 'red', marginBottom: '10px' }}>{lookupError}</div>}
               <button type="submit" className="returns-btn" disabled={loading}>
-                {loading ? <span className="spinner" style={{display:'inline-block',width:'18px',height:'18px',border:'3px solid #fff',borderTop:'3px solid #7c3aed',borderRadius:'50%',animation:'spin 1s linear infinite',verticalAlign:'middle'}}></span> : 'Lookup Order'}
+                {loading ? <span className="spinner" style={{ display: 'inline-block', width: '18px', height: '18px', border: '3px solid #fff', borderTop: '3px solid #7c3aed', borderRadius: '50%', animation: 'spin 1s linear infinite', verticalAlign: 'middle' }}></span> : 'Lookup Order'}
               </button>
             </form>
           )}
@@ -282,9 +282,9 @@ const ReturnsExchange = () => {
                 <label htmlFor="invoice">Upload Invoice (optional)</label>
                 <input type="file" id="invoice" name="invoice" accept="application/pdf,image/*" onChange={handleChange} />
               </div>
-              <div className="form-group" style={{display:'flex',alignItems:'center',gap:'8px'}}>
+              <div className="form-group" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
                 <input type="checkbox" id="agree" name="agree" checked={form.agree} onChange={handleChange} required />
-                <label htmlFor="agree" style={{margin:0}}>I agree to the <a href="#" target="_blank" rel="noopener noreferrer">return policy</a></label>
+                <label htmlFor="agree" style={{ margin: 0 }}>I agree to the <a href="#" target="_blank" rel="noopener noreferrer">return policy</a></label>
                 {errors.agree && <span className="error-message">{errors.agree}</span>}
               </div>
               <button className="returns-btn" type="submit">Continue</button>
@@ -313,16 +313,16 @@ const ReturnsExchange = () => {
                   </>
                 )}
                 {form.file && (
-                  <div style={{marginTop: '10px'}}>
+                  <div style={{ marginTop: '10px' }}>
                     <b>Uploaded Product Image:</b><br />
-                    <img src={URL.createObjectURL(form.file)} alt="Uploaded" style={{maxWidth: '120px', borderRadius: '8px'}} />
+                    <img src={URL.createObjectURL(form.file)} alt="Uploaded" style={{ maxWidth: '120px', borderRadius: '8px' }} />
                   </div>
                 )}
                 {form.invoice && (
-                  <div style={{marginTop: '10px'}}>
+                  <div style={{ marginTop: '10px' }}>
                     <b>Uploaded Invoice:</b><br />
                     {form.invoice.type.startsWith('image') ? (
-                      <img src={URL.createObjectURL(form.invoice)} alt="Invoice" style={{maxWidth: '120px', borderRadius: '8px'}} />
+                      <img src={URL.createObjectURL(form.invoice)} alt="Invoice" style={{ maxWidth: '120px', borderRadius: '8px' }} />
                     ) : (
                       <a href={URL.createObjectURL(form.invoice)} target="_blank" rel="noopener noreferrer">View Invoice</a>
                     )}
@@ -351,28 +351,28 @@ const ReturnsExchange = () => {
         {/* Return Policy Section */}
         <div className="returns-faq">
           <h2>Return & Exchange Policy</h2>
-          
+
           <div className="policy-section">
             <h3>📋 General Policy</h3>
             <p>We have a <strong>2 DAYS RETURN POLICY</strong> only on fresh articles. In case of defected/damaged product, complaint should be raised within <strong>24 hours</strong> of delivery of product.</p>
-            
+
             <h3>📧 How to Initiate Return</h3>
             <p>If the customer is unsatisfied with the product delivered then he/she needs to:</p>
             <ul>
-              <li>Mail us at <strong>info@fika-india.com</strong> within 2 days from the date of receiving the parcel</li>
+              <li>Mail us at <strong>info@plantvigor.com</strong> within 2 days from the date of receiving the parcel</li>
               <li>OR register a return pickup from the tab <strong>"exchange & return"</strong> on the home page</li>
             </ul>
-            <p>FIKA will arrange a pick-up from your place (reverse pick-up may not be available on selected pin-codes).</p>
+            <p>PlantVigor will arrange a pick-up from your place (reverse pick-up may not be available on selected pin-codes).</p>
           </div>
 
           <div className="policy-section">
             <h3>💰 Refund Options</h3>
             <p>We have two options for processing such returns:</p>
-            
+
             <div className="refund-option">
               <h4>1. Store Credit</h4>
               <ul>
-                <li>We add amount equal to the product value to your <strong>'FIKA Account'</strong></li>
+                <li>We add amount equal to the product value to your <strong>'PlantVigor Account'</strong></li>
                 <li>You can use this credit amount when you reach the cart/payment page of the website during your next purchase with us</li>
                 <li>Store Credit will be issued only after we receive back the product and validate the return</li>
                 <li>Store credit once issued cannot be refunded back in Bank/Card/Wallet etc.</li>
@@ -392,7 +392,7 @@ const ReturnsExchange = () => {
           <div className="policy-section">
             <h3>🏷️ Discounted Products</h3>
             <p><strong>DISCOUNTED PRODUCT:</strong> Discounted product can only be exchanged and refund cannot be done for the same. New and fresh products can be purchased from the store credit available from the return of discounted product.</p>
-            
+
             <div className="important-note">
               <p><strong>Important:</strong> If discounted bill value is below ₹2999 then there will be a shipping charge of ₹200/- which the customer has to bear while exchanging the product.</p>
               <p><strong>Note:</strong> However coupon codes which are offered by us do not fall under the discounted category and hence are eligible for refunds.</p>
@@ -401,7 +401,7 @@ const ReturnsExchange = () => {
 
           <div className="policy-section">
             <h3>⚠️ Other Cases & Important Terms</h3>
-            
+
             <div className="refund-option">
               <h4>Our Error Cases</h4>
               <p>If the return is due to an error on our part (incorrect item sent, damaged/defective product), we will replace the product or reimburse the full invoice value as per customer demand.</p>
@@ -419,8 +419,8 @@ const ReturnsExchange = () => {
             <div className="refund-option">
               <h4>Pickup & Package Handling</h4>
               <ul>
-                <li>In case a reverse pick-up is not done for any reason (due to any reason owing to customer or the courier company's mistake), responsibility lies on the customer to contact Fika to arrange for the pick-up again</li>
-                <li>Failure to contact Fika timely to arrange the reverse pick-up again may lead to rejection for exchange/return request</li>
+                <li>In case a reverse pick-up is not done for any reason (due to any reason owing to customer or the courier company's mistake), responsibility lies on the customer to contact PlantVigor to arrange for the pick-up again</li>
+                <li>Failure to contact PlantVigor timely to arrange the reverse pick-up again may lead to rejection for exchange/return request</li>
                 <li>Return requests will only be entertained if the customer has accepted untampered package</li>
                 <li>If the package is tampered, customer should not accept the package and should return the package to the delivery person then and there</li>
               </ul>
@@ -432,14 +432,14 @@ const ReturnsExchange = () => {
                 <li>Once approved as an eligible return, we will issue your refund or store credit (as the case may be) of the appropriate amount within <strong>10 days</strong></li>
                 <li>If however the return is found not eligible for refund, we will courier the same back to you</li>
                 <li>In either scenario your return issue will be closed within <strong>7 days</strong> of our receiving of the return package from you</li>
-                <li><strong>Fika will not be liable for any damage that happens during return shipping</strong></li>
+                <li><strong>PlantVigor will not be liable for any damage that happens during return shipping</strong></li>
               </ul>
             </div>
 
             <div className="refund-option">
               <h4>Customer Agreement & Validation</h4>
               <ul>
-                <li>The customer agrees not to dispute the decision made by Fika and accept decision regarding the return validation that is - if the product is valid to be accepted as return or not</li>
+                <li>The customer agrees not to dispute the decision made by PlantVigor and accept decision regarding the return validation that is - if the product is valid to be accepted as return or not</li>
                 <li>Non-Valid return will be sent back to the customer</li>
                 <li>For repeated return of products from a customer i.e. more than 50% of the delivered products, the customer will be intimated that future orders on non-cancellation and non-return basis</li>
                 <li>Afterwards, all future orders will be processed on mentioned conditions</li>

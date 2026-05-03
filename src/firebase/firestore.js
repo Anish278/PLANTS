@@ -1903,4 +1903,57 @@ export const simulateMultipleBought = async (productId, count) => {
     console.error('Error simulating bought counts for Wish Genie product:', error);
     // Don't throw error to avoid breaking the product page
   }
-}; 
+};
+
+// SOCIAL MEDIA POSTS
+
+/**
+ * Get all social media posts (for homepage display)
+ * @returns {Promise<Array>} - Array of social media post objects
+ */
+export const getSocialMediaPosts = async () => {
+  try {
+    const q = query(
+      collection(db, 'socialMedia'),
+      orderBy('createdAt', 'desc'),
+      limit(4)
+    );
+    const snapshot = await getDocs(q);
+    return snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (error) {
+    console.error('Error getting social media posts:', error);
+    return [];
+  }
+};
+
+/**
+ * Add a new social media post
+ * @param {Object} postData - { imageUrl, caption, likes, link }
+ * @returns {Promise<string>} - The ID of the created post
+ */
+export const addSocialMediaPost = async (postData) => {
+  try {
+    const ref = await addDoc(collection(db, 'socialMedia'), {
+      ...postData,
+      createdAt: serverTimestamp()
+    });
+    return ref.id;
+  } catch (error) {
+    console.error('Error adding social media post:', error);
+    throw error;
+  }
+};
+
+/**
+ * Delete a social media post
+ * @param {string} postId - The post ID to delete
+ * @returns {Promise<void>}
+ */
+export const deleteSocialMediaPost = async (postId) => {
+  try {
+    await deleteDoc(doc(db, 'socialMedia', postId));
+  } catch (error) {
+    console.error('Error deleting social media post:', error);
+    throw error;
+  }
+};

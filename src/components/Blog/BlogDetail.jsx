@@ -7,293 +7,104 @@ const BlogDetail = () => {
 
     const blogs = [
         {
-            id: 1,
-            title: "Elevate Your Home with Thoughtfully Designed Home Décor from Fika India",
-            excerpt: "A home is more than just a space it’s a reflection of your personality, taste, and lifestyle. At Fika India, we believe that the right home décor can transform everyday living into something warm, inviting, and meaningful.",
-            content: `A home is more than just a space it’s a reflection of your personality, taste, and lifestyle. At Fika India, we believe that the right home décor can transform everyday living into something warm, inviting, and meaningful. Our curated collection of décor and lifestyle products is designed to help you create spaces that feel calm, stylish, and effortlessly elegant.
+            id: 'snake-plant',
+            title: 'Snake Plant: The Unkillable Companion',
+            excerpt: 'Discover why the Snake Plant is the perfect roommate for your home...',
+            content: `The Snake Plant (Sansevieria) is widely regarded as one of the toughest houseplants you can own. Whether you're a seasoned gardener or a self-proclaimed "black thumb," this plant is nearly impossible to kill.
 
-### The Philosophy Behind Fika India
+### Why Every Home Needs a Snake Plant
 
-Inspired by the idea of slowing down and appreciating everyday moments, Fika India brings a mindful approach to home styling. Our designs focus on simplicity, comfort, and timeless aesthetics perfect for modern Indian homes. Every product is thoughtfully selected to blend functionality with visual appeal, ensuring your space feels both beautiful and livable.
+The Snake Plant is a powerhouse of air purification. Unlike most plants that release oxygen only during the day, the Snake Plant continues to produce oxygen at night, making it an ideal companion for your bedroom. It is also known to filter out common toxins like formaldehyde and benzene from the air.
 
-### Thoughtfully Curated Home Décor Products
+### Minimal Care, Maximum Reward
 
-At Fika India, our all products collection showcases a range of décor and lifestyle essentials crafted to elevate different corners of your home. Whether you are refreshing your living room, bedroom, or cozy reading nook, our products add warmth and character without overwhelming the space.
+One of the biggest draws of the Snake Plant is its low-maintenance nature.
+• Light: It thrives in almost any light condition, from low-light corners to bright, indirect sunlight.
+• Water: It prefers to be on the drier side. Water it only when the soil is completely dry—usually every 2-4 weeks depending on your home's humidity.
+• Soil: Use a well-draining cactus or succulent mix to prevent root rot.
 
-From soft furnishings to decorative accents, our collection is ideal for those who love:
-• Minimal yet elegant home décor
-• Neutral tones with modern appeal
-• Products that complement contemporary and Scandinavian inspired interiors
-• Décor that feels calm, cozy, and inviting
+### Styling with Snake Plants
 
-Each product is designed to fit seamlessly into your home while enhancing its overall aesthetic.
-
-### Why Choose Fika India for Home Décor?
-
-Choosing the right home décor brand makes all the difference. Fika India stands out because we focus on quality, design consistency, and customer experience.
-
-### What makes Fika India special:
-
-• Premium-quality home décor products
-• Clean, modern, and timeless designs
-• Perfect for everyday living and gifting
-• Suitable for modern Indian homes
-• Carefully curated collections rather than mass produced items
-
-Our goal is to help you style your home in a way that feels personal, comfortable, and enduring.
-
-### Styling Your Home the Fika Way
-
-Decorating your home doesn’t have to be complicated. With Fika India, you can create a cohesive look by choosing décor pieces that complement each other in color, texture, and design. Whether you prefer a minimalist setup or a warm, layered look, our products allow you to express your style with ease.
-
-Small décor changes like adding the right accessories or soft furnishings—can make a big impact on how your space looks and feels.
-
-### Shop Home Décor Online in India
-
-Fika India makes it easy to shop home décor online in India with a seamless browsing and shopping experience. Our website is designed to help you explore all products effortlessly, discover new décor ideas, and choose items that suit your home perfectly.
-
-With detailed product listings and carefully curated collections, finding the right décor pieces has never been easier.
-
-### Conclusion
-
-If you’re looking to upgrade your living space with stylish, modern, and thoughtfully designed décor, Fika India is your go to destination. Explore our all products collection and discover home décor that turns everyday spaces into places you truly love.
-
-Create a home that feels calm, stylish, and welcoming with Fika India.`,
-            image: "/FK-BS-001 Full.webp",
-            date: "February 2026",
-            category: "Home Décor"
+With its tall, sword-like leaves and architectural shape, the Snake Plant adds a modern, sculptural element to any room. It looks great in minimalist ceramic pots or rustic baskets. Because it grows vertically, it's perfect for tight spaces where you want to add a touch of green without taking up too much floor area.`,
+            image: "/snake-plant.png",
+            date: "May 2026",
+            category: "Care Guide"
         },
         {
-            id: 2,
-            title: "Modern & Minimalist Home Decor Items by Fika India",
-            excerpt: "Buy home decor online in India at Fika India. Explore modern and minimalist home decor items, premium cushions, candles and home accessories online.",
-            content: `Modern & Minimalist Home Decor Items by Fika India
+            id: 'peace-lily',
+            title: 'The Graceful Peace Lily',
+            excerpt: 'Learn how to keep your Peace Lily blooming year-round with these simple tips...',
+            content: `The Peace Lily (Spathiphyllum) is a classic houseplant known for its elegant white blooms and lush, dark green foliage. It is a symbol of peace, purity, and prosperity, making it a popular choice for both homes and offices.
 
-Buy home decor online in India at Fika India. Explore modern and minimalist home decor items, premium cushions, candles and home accessories online.
+### The Beauty of Blooms
 
-### Home Decor Online in India Modern & Minimalist Home Decor Items
+The "flowers" of the Peace Lily are actually modified leaves called spathes. These stunning white hoods protect the true, tiny flowers on the spike inside. With proper care, a Peace Lily can bloom multiple times a year, adding a touch of sophisticated beauty to your indoor space.
 
-Choosing the right home decor online is essential for creating interiors that feel stylish, comfortable, and timeless. At Fika India, home décor is thoughtfully designed to suit modern Indian homes where aesthetics, quality, and functionality come together.
+### Essential Care Tips
 
-From elegant cushions to refined décor accessories, Fika India offers curated home decor items that seamlessly blend modern design with everyday living.
+Peace Lilies are relatively easy to care for, but they do have some specific preferences.
+• Light: They love bright, indirect light. Direct sunlight can scorch their leaves, while too little light may prevent blooming.
+• Water: They are famous for "fainting" when they are thirsty. If the leaves start to droop, it's time for a drink. Keep the soil consistently moist but never soggy.
+• Humidity: Being tropical plants, they appreciate a bit of extra humidity. Misting the leaves occasionally or using a pebble tray can help them thrive.
 
-### Why Buy Home Decor Online from Fika India
+### A Natural Air Purifier
 
-When you buy home decor online, quality and design matter. Fika India focuses on:
-• Carefully curated décor collections
-• Premium materials and craftsmanship
-• Designs that complement modern and minimalist interiors
-
-Shopping home accessories online at Fika India ensures access to décor pieces that are stylish, functional, and easy to pair with existing interiors.
-
-### Modern Home Decor Items Designed for Everyday Living
-
-Modern home decor items from Fika India are created to enhance living spaces without overwhelming them. Each product is designed keeping balance and versatility in mind.
-
-Popular modern décor offerings include:
-• Decorative cushions that add texture and warmth
-• Minimal décor accessories for shelves and side tables
-• Elegant candles that enhance ambience
-
-These pieces work well across living rooms, bedrooms, and cozy corners of the home.
-
-### Minimalist Home Decor with a Premium Touch
-
-Minimalist home decor is at the heart of Fika India’s design philosophy. The focus is on:
-• Clean designs
-• Neutral and calming colour palettes
-• Décor that feels intentional rather than excessive
-
-By choosing a few well designed décor elements, minimalist interiors remain timeless and clutter free.
-
-### Living Room Decor Items That Define Your Space
-
-The living room reflects your personal style. Selecting the right living room decor items can transform the space instantly.
-
-Fika India’s décor collections help create a balanced living room with:
-• Stylish cushion combinations
-• Subtle décor accents
-• Candles and accessories that add warmth
-
-Each item is designed to blend effortlessly with modern Indian interiors.
-
-### Choosing the Right Home Accessories Online
-
-When browsing home accessories online, Fika India encourages a thoughtful approach:
-• Select versatile décor items
-• Focus on quality over quantity
-• Choose designs that suit multiple spaces
-
-This ensures your décor remains functional, stylish, and long lasting.
-
-### Buy Home Decor Online That Matches Modern Indian Homes
-
-Fika India offers décor pieces crafted for homes that value simplicity, comfort, and refined aesthetics. Whether you are updating a single corner or refreshing an entire room, Fika India’s home decor online collections make styling effortlessly.`,
-            image: "/FK-CC-001.webp",
-            date: "February 2026",
-            category: "Home Décor"
+Beyond its beauty, the Peace Lily is an exceptional air purifier. It's one of the few plants capable of breaking down toxic gases like carbon monoxide and formaldehyde, ensuring the air in your home stays fresh and clean.`,
+            image: "/peace-lily.png",
+            date: "May 2026",
+            category: "Houseplants"
         },
         {
-            id: 3,
-            title: "Buy Home Decor Online in India: Thoughtfully Designed Spaces with FIKA",
-            excerpt: "In recent years, the way people style their homes has evolved significantly. Today, homeowners are not just looking for decor items they are looking for meaning, comfort, and design that reflects their lifestyle.",
-            content: `In recent years, the way people style their homes has evolved significantly. Today, homeowners are not just looking for decor items they are looking for meaning, comfort, and design that reflects their lifestyle. With the rise of home decor online, finding the right pieces has become easier, smarter, and more inspiring.
+            id: 'aloe-vera',
+            title: 'Healing Power of Aloe Vera',
+            excerpt: 'Beyond its beauty, Aloe Vera offers incredible medicinal benefits...',
+            content: `Aloe Vera is often called the "Plant of Immortality" for good reason. This succulent is not only a beautiful addition to a sunny windowsill but also a living first-aid kit that every household should have.
 
-FIKA, a modern Indian home decor brand, brings together carefully curated collections that balance aesthetics, quality, and everyday usability. Whether you want to refresh a corner or redesign an entire room, FIKA makes it simple to buy home decor online with confidence.
+### The Science of Healing
 
-### Why Shopping for Home Decor Online Makes Sense Today
+The clear gel found inside Aloe Vera leaves is packed with vitamins, minerals, and antioxidants. It has been used for centuries to treat minor burns, soothe sunburns, and promote skin healing. Its anti-inflammatory properties make it a natural remedy for various skin irritations.
 
-Choosing home decor online India gives you access to a wider variety of styles, finishes, and ideas than traditional shopping. A trusted home decor store online allows you to explore collections at your own pace and select decor that complements your space perfectly.
+### Growing Your Own Medicine
 
-At FIKA, each product is thoughtfully selected to meet the needs of modern homes. From home decor items for daily living to statement accessories, the focus is always on timeless design and quality craftsmanship.
+Aloe Vera is a hardy succulent that requires very little attention.
+• Sun: They need plenty of bright, direct sunlight. A south-facing window is usually the best spot.
+• Water: Being a succulent, it stores water in its leaves. Only water when the soil has dried out completely. Overwatering is the most common mistake with Aloe.
+• Potting: Use a well-draining succulent mix and a pot with drainage holes to keep the roots healthy.
 
-### Modern Home Decor Items for Stylish Indian Homes
+### More Than Just a Gel
 
-Indian homes today blend tradition with contemporary living. FIKA’s collection of modern home decor items is designed to suit this balance clean lines, subtle textures, and calming colors that work across spaces.
-
-Whether it’s living room decor items that create a welcoming first impression or accents that add warmth, FIKA offers luxury home decor items that feel elegant without being overwhelming.
-
-### Elevate Your Living Room with Premium Decor Accessories
-
-The living room is where style meets comfort. Choosing the right home decor accessories online can completely transform how the space feels.
-
-FIKA’s range of living room home decor accessories includes cushions and candles that add depth, softness, and character. These carefully curated pieces allow you to create a space that feels inviting, balanced, and visually appealing.
-
-### Designer Cushion Covers That Add Comfort & Character
-
-Cushions are one of the easiest ways to refresh a space, and FIKA’s cushion collection is designed to do exactly that. Explore elegant decorative cushion cover designs that suit modern and classic interiors alike.
-
-The collection includes:
-• Stylish designer cushion covers for sofas and seating
-• High-quality premium cushion cover options
-• Soft and supportive luxury cushions for sofa
-• Trend-led decorative cushions online
-• Curated cushion covers online India for Indian homes
-
-Each piece is designed to combine comfort with visual appeal, making everyday spaces feel thoughtfully styled.
-
-### Create the Perfect Ambience with Scented & Decorative Candles
-
-Ambience plays a key role in how a home feels. FIKA’s candle collection is designed to enhance mood and atmosphere through subtle design and fragrance.
-
-From scented candles for home decor to elegant decorative candles online, these pieces are perfect for both everyday use and special moments. A carefully chosen scented candle for living room can instantly make a space feel calmer, while luxury scented candles India add a refined touch to modern interiors.
-
-### Bedroom Decor Accessories for Calm & Comfort
-
-Your bedroom should be a place to relax and unwind. With thoughtfully chosen bedroom decor accessories, FIKA helps create a soothing environment using soft textures and minimal design.
-
-Cushions and candles work beautifully together to create a space that feels peaceful, personal, and comfortable.
-
-### Explore Minimalist, Boho & Luxury Decor Styles
-
-Every home has its own personality, and FIKA celebrates this through diverse design aesthetics. Whether your preference is clean and simple minimalist home decor, expressive boho home decor, or refined luxury home decor accessories, FIKA offers pieces that blend seamlessly into your space.
-
-The range of modern home decor accessories ensures that your decor feels cohesive and timeless rather than trend-driven.
-
-### Handcrafted & Conscious Decor for Modern Living
-
-FIKA values craftsmanship and authenticity. The collection includes handcrafted home decor items that reflect attention to detail and quality.
-
-With growing awareness around conscious living, FIKA also supports handmade home decor items India that feel personal and thoughtfully made. The brand continues to explore sustainable home decor India, combining responsible choices with beautiful design.
-
-### Premium Home Decor Items Online for Every Space
-
-Whether you live in a compact apartment or a spacious home, FIKA offers premium home decor items online that suit every lifestyle. With a focus on design, durability, and comfort, FIKA’s range of home decor accessories online makes styling your home effortless.
-
-From cushions to candles, every piece is designed to elevate everyday living.
-
-### Why FIKA Is a Trusted Indian Home Decor Brand
-
-FIKA stands for thoughtful design, quality materials, and a refined aesthetic. As a growing Indian home decor brand, FIKA focuses on creating decor that feels meaningful, functional, and beautiful.
-
-By offering carefully curated modern home decor items and accessories, FIKA helps homeowners create spaces that truly feel like home.
-
-If you’re looking to buy home decor online that combines style, comfort, and quality, FIKA offers a thoughtfully designed collection for modern Indian homes. With elegant cushions, calming candles, and refined accessories, FIKA makes everyday living more beautiful one detail at a time.`,
-            image: "/FK-CC-020.webp",
-            date: "February 2026",
-            category: "Home Décor"
+While the gel is its most famous feature, the Aloe Vera plant itself is a striking decorative element. Its thick, fleshy leaves with serrated edges add a unique texture to any plant collection. Plus, it's great at clearing pollutants from the air, making your home healthier as well as prettier.`,
+            image: "https://images.unsplash.com/photo-1596547609652-9cf5d8d76921?auto=format&fit=crop&w=800&q=80",
+            date: "May 2026",
+            category: "Wellness"
         },
         {
-            id: 4,
-            title: "Premium Home Decor Accessories Online: Elevate Every Corner of Your Home with FIKA",
-            excerpt: "A well designed home is created through details the textures you touch, the colours you see, and the atmosphere you feel. Today, with the growth of home decor online, homeowners can easily curate spaces that reflect both comfort and personality.",
-            content: `A well designed home is created through details the textures you touch, the colours you see, and the atmosphere you feel. Today, with the growth of home decor online, homeowners can easily curate spaces that reflect both comfort and personality. FIKA, a modern Indian home decor brand, brings together thoughtfully designed pieces that enhance everyday living.
+            id: 'monstera',
+            title: 'Monstera: The Jungle King',
+            excerpt: 'Transform your living room into a tropical paradise with the iconic Swiss Cheese Plant...',
+            content: `The Monstera Deliciosa, commonly known as the Swiss Cheese Plant, is the undisputed king of the "urban jungle" trend. Its large, heart-shaped leaves with unique natural holes (fenestrations) make it an instant focal point in any room.
 
-Whether you are planning a complete makeover or simply want to buy home decor online for a subtle refresh, FIKA offers curated collections that blend style, quality, and function.
+### Bringing the Tropics Home
 
-### Discover a Trusted Home Decor Store Online in India
+Monsteras are native to the rainforests of Central America, and they bring that lush, tropical energy right into your home. They are fast growers and can reach impressive sizes, making them perfect for filling a large corner or creating a green wall.
 
-Shopping from a reliable home decor store online gives you access to refined designs and premium quality from the comfort of your home. With home decor online India, customers now prefer brands that offer consistency, aesthetics, and durability.
+### How to Tame the Beast
 
-FIKA’s range of home decor items is designed to suit modern Indian lifestyles clean designs, versatile colours, and timeless appeal that works across spaces.
+Despite its exotic look, the Monstera is surprisingly easy to grow.
+• Light: It thrives in bright, indirect light. It can tolerate some shade, but its leaves will stay smaller and won't develop as many holes without enough light.
+• Support: In the wild, Monsteras are climbers. Giving your plant a moss pole or trellis to climb will encourage larger, healthier leaves.
+• Watering: Water when the top inch or two of soil feels dry. They enjoy high humidity, so regular misting is highly recommended.
 
-### Living Room Decor Items That Define Your Style
+### A Statement Piece
 
-The living room sets the tone for your entire home. Choosing the right living room decor items can transform it from ordinary to inviting. FIKA’s curated collection of luxury home decor items and living room home decor accessories helps create spaces that feel warm, stylish, and balanced.
-
-From cushions to candles, every element is designed to complement modern interiors while adding a personal touch.
-
-### Designer Cushion Covers for Comfort & Visual Balance
-
-Cushions are essential for both comfort and style. FIKA offers a premium range of decorative cushion cover designs crafted to enhance sofas, chairs, and beds.
-
-Explore:
-• Elegant designer cushion covers
-• Soft, durable premium cushion cover collections
-• Comfortable luxury cushions for sofa
-• Trend-led decorative cushions online
-• Curated cushion covers online India suitable for Indian homes
-
-These designs allow you to refresh your interiors effortlessly.
-
-### Scented & Decorative Candles for a Refined Ambience
-
-Ambience plays a powerful role in how a home feels. FIKA’s candle collection focuses on subtle elegance and calming fragrances. From scented candles for home decor to beautifully crafted decorative candles online, these pieces elevate both everyday living and special moments.
-
-A carefully chosen scented candle for living room adds warmth, while luxury scented candles India bring sophistication to modern spaces.
-
-### Bedroom Decor Accessories for Calm & Comfort
-
-Bedrooms should feel peaceful and inviting. With thoughtfully selected bedroom decor accessories, FIKA helps create a space that promotes rest and relaxation.
-
-Soft furnishings and ambient candles work together to bring balance, comfort, and simplicity to personal spaces.
-
-### Explore Modern, Minimalist & Boho Decor Styles
-
-FIKA understands that every home tells a different story. The collections cater to various design preferences, including:
-• Clean and soothing minimalist home decor
-• Expressive and relaxed boho home decor
-• Elegant luxury home decor accessories
-• Versatile modern home decor accessories
-
-Each piece is designed to integrate seamlessly into contemporary Indian homes.
-
-### Handcrafted & Sustainable Home Decor for Conscious Living
-
-Authenticity matters in modern decor choices. FIKA proudly offers handcrafted home decor items that reflect skilled craftsmanship and attention to detail.
-
-The brand also supports handmade home decor items India, combining tradition with modern design sensibilities. With growing awareness around responsible choices, FIKA continues to explore sustainable home decor India that aligns style with conscious living.
-
-### Premium Home Decor Items Online for Every Space
-
-From compact apartments to spacious homes, FIKA provides premium home decor items online designed for every setting. The carefully curated range of home decor accessories online ensures consistency in quality and design throughout your home.
-
-Each product is crafted to offer long lasting style and everyday usability.
-
-### Why FIKA Is a Preferred Indian Home Decor Brand
-
-FIKA stands for thoughtful design, refined aesthetics, and quality craftsmanship. As a trusted Indian home decor brand, FIKA focuses on creating decor that enhances real homes and real lifestyles.
-
-With a balanced mix of modern home decor items, soft furnishings, and candles, FIKA helps homeowners style their spaces with confidence.
-
-If you’re looking to buy home decor online that blends comfort, quality, and timeless design, FIKA offers a curated experience for modern Indian homes. Every piece is designed to make your space feel welcoming, personal, and beautifully styled.`,
-            image: "/FK-BS-003 Full.webp",
-            date: "February 2026",
-            category: "Home Décor"
+A mature Monstera is more than just a plant; it's a piece of living art. Its dramatic foliage complements a wide range of interior styles, from bohemian to mid-century modern. Whether you have one large specimen or several smaller ones, the Monstera is sure to bring a sense of adventure and vibrancy to your space.`,
+            image: "https://images.unsplash.com/photo-1614594975525-e45190c55d0b?auto=format&fit=crop&w=800&q=80",
+            date: "May 2026",
+            category: "Design"
         }
     ];
 
-    const blog = blogs.find(b => b.id === parseInt(id));
+    const blog = blogs.find(b => b.id.toString() === id.toString());
 
     useEffect(() => {
         window.scrollTo(0, 0);

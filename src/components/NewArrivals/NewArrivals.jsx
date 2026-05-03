@@ -12,6 +12,7 @@ import LoginPrompt from "../../components/LoginPrompt/LoginPrompt";
 import config from "../../config";
 import { db } from '../../firebase/config';
 import { collection, getDocs } from 'firebase/firestore';
+import { toast } from 'react-toastify';
 import OptimizedImage from '../../Component/OptimizedImage';
 
 const NewArrivals = () => {
@@ -47,7 +48,7 @@ const NewArrivals = () => {
 
   const autoScrollTimer = useRef(null);
   const { addToCart } = useCart();
-  const { addToWishlist, isInWishlist, removeFromWishlist } = useWishlist();
+  const { addToWishlist, isInWishlist, removeFromWishlist, toggleWishlist } = useWishlist();
   const navigate = useNavigate();
   const [newsletterEmail, setNewsletterEmail] = useState("");
   const [newsletterSuccess, setNewsletterSuccess] = useState(false);
@@ -227,36 +228,39 @@ const NewArrivals = () => {
   const handleAddToCart = (product, e) => {
     if (e) e.stopPropagation();
     if (!isAuthenticated) {
+      toast.warning("Please login to add items to cart");
       setShowLoginPrompt(true);
       return;
     }
     // Normalize product data for cart
     const normalizedProduct = {
       ...product,
-      name: product.product_name || product.name,
-      price: product.mrp || product.price,
-      image: product.image || '/placeholder-image.webp'
+      id: product.id,
+      name: product.product_name || product.name || product.plantName || "Product",
+      price: Number(product.mrp || product.MRP || product.price || 0),
+      discount: Number(product.discount || 0),
+      image: product.image || (product.imageUrls && product.imageUrls[0]) || '/placeholder-image.webp'
     };
     addToCart(normalizedProduct, undefined, 1, navigate);
+    toast.success(`${normalizedProduct.name} added to cart!`);
   };
 
   const handleAddToWishlist = (product, e) => {
     if (e) e.stopPropagation();
     if (!isAuthenticated) {
+      toast.warning("Please login to manage your wishlist");
       setShowLoginPrompt(true);
       return;
     }
-    if (isInWishlist(product.id)) {
-      removeFromWishlist(product.id, navigate);
+    const productId = product.id;
+    const isCurrentlyWishlisted = isInWishlist(productId);
+    
+    toggleWishlist(product);
+    
+    if (!isCurrentlyWishlisted) {
+      toast.success(`${product.product_name || product.plantName || product.name} added to wishlist!`);
     } else {
-      // Normalize product data for wishlist
-      const normalizedProduct = {
-        ...product,
-        product_name: product.product_name || product.name,
-        mrp: product.mrp || product.price,
-        image: product.image || '/placeholder-image.webp'
-      };
-      addToWishlist(normalizedProduct, navigate);
+      toast.info(`${product.product_name || product.plantName || product.name} removed from wishlist`);
     }
   };
 
@@ -373,7 +377,7 @@ const NewArrivals = () => {
           />
           {product.inventory <= 0 && (
             <div className="out-of-stock-overlay">
-              <span>Out of Stock</span>
+              <span>Buy Now</span>
             </div>
           )}
           <div className="views-overlay" title="Views">
@@ -386,7 +390,6 @@ const NewArrivals = () => {
               className="product-action-btn cart-btn"
               onClick={(e) => handleAddToCart(product, e)}
               title="Add to Cart"
-              disabled={product.inventory <= 0}
             >
               <FaShoppingCart />
             </button>

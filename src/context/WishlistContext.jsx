@@ -80,11 +80,26 @@ export const WishlistProvider = ({ children }) => {
     return wishlist.some(item => item.productId === productId);
   };
 
+  const toggleWishlist = async (product) => {
+    if (!user?.email) {
+      console.log('[WishlistContext] No user logged in, cannot toggle wishlist');
+      return;
+    }
+
+    const productId = product.id;
+    if (isInWishlist(productId)) {
+      await removeFromWishlist(productId);
+    } else {
+      await addToWishlist(product);
+    }
+  };
+
   const value = {
     wishlist,
     addToWishlist,
     removeFromWishlist,
-    isInWishlist
+    isInWishlist,
+    toggleWishlist
   };
 
   return (

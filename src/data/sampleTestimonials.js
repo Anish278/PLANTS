@@ -3,7 +3,7 @@
 
 export const sampleTestimonials = [
   {
-    text: "I was looking for quality bedsheets that would last, and Fika delivered beyond my expectations! The cotton feels so soft against my skin, and even after multiple washes, the colors stay vibrant. My family loves them too!",
+    text: "I was looking for quality bedsheets that would last, and PlantVigor delivered beyond my expectations! The cotton feels so soft against my skin, and even after multiple washes, the colors stay vibrant. My family loves them too!",
     author: "Priya Sharma",
     location: "Delhi",
     image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop",
@@ -21,7 +21,7 @@ export const sampleTestimonials = [
     status: "active"
   },
   {
-    text: "During the monsoon season, I needed quick-drying bedsheets, and a friend recommended Fika. Not only do they dry fast, but they're also so comfortable! Customer service helped me choose the right material over WhatsApp. Truly amazing!",
+    text: "During the monsoon season, I needed quick-drying bedsheets, and a friend recommended PlantVigor. Not only do they dry fast, but they're also so comfortable! Customer service helped me choose the right material over WhatsApp. Truly amazing!",
     author: "Kavita Reddy",
     location: "Bangalore",
     image: "https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?w=150&h=150&fit=crop",
@@ -39,7 +39,7 @@ export const sampleTestimonials = [
     status: "active"
   },
   {
-    text: "Fika's customer service is exceptional! They helped me choose the right pillow covers for my bedroom theme. The quality is top-notch and the prices are reasonable.",
+    text: "PlantVigor's customer service is exceptional! They helped me choose the right pillow covers for my bedroom theme. The quality is top-notch and the prices are reasonable.",
     author: "Anjali Singh",
     location: "Chennai",
     image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=150&h=150&fit=crop",
@@ -48,7 +48,7 @@ export const sampleTestimonials = [
     status: "active"
   },
   {
-    text: "I love how Fika offers sustainable and eco-friendly options. The organic cotton bedsheets are not only comfortable but also good for the environment. Highly recommend!",
+    text: "I love how PlantVigor offers sustainable and eco-friendly options. The organic cotton bedsheets are not only comfortable but also good for the environment. Highly recommend!",
     author: "Vikram Mehta",
     location: "Hyderabad",
     image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop",
@@ -66,7 +66,7 @@ export const sampleTestimonials = [
     status: "active"
   },
   {
-    text: "Fika has become my go-to place for all home textiles. From bedsheets to curtains, everything is of premium quality. The delivery is always on time!",
+    text: "PlantVigor has become my go-to place for all home textiles. From bedsheets to curtains, everything is of premium quality. The delivery is always on time!",
     author: "Suresh Kumar",
     location: "Ahmedabad",
     image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150&h=150&fit=crop",

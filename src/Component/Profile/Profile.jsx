@@ -168,9 +168,6 @@ const Profile = () => {
             <Link to="/addresses" className="menu-item">
               Manage Addresses
             </Link>
-            <Link to="/pan-info" className="menu-item">
-              PAN Card Information
-            </Link>
           </div>
 
           {/* PAYMENTS Section */}
@@ -362,11 +359,11 @@ const Profile = () => {
               <p>Your login email id (or mobile number) changes, likewise. You'll receive all your account related communication on your updated email address (or mobile number).</p>
             </div>
             <div className="faq-item">
-              <h3>When will my Fika account be updated with the new email address (or mobile number)?</h3>
+              <h3>When will my PlantVigor account be updated with the new email address (or mobile number)?</h3>
               <p>It happens as soon as you confirm the verification code sent to your email (or mobile) and save the changes.</p>
             </div>
             <div className="faq-item">
-              <h3>What happens to my existing Fika account when I update my email address (or mobile number)?</h3>
+              <h3>What happens to my existing PlantVigor account when I update my email address (or mobile number)?</h3>
               <p>Updating your email address (or mobile number) doesn't invalidate your account. Your account remains fully functional. You'll continue seeing your Order history, saved information and personal details.</p>
             </div>
           </div>

@@ -112,7 +112,7 @@ const FeaturedStories = () => {
 
   const testimonials = [
     {
-      text: "I was looking for quality bedsheets that would last, and Fika delivered beyond my expectations! The cotton feels so soft against my skin, and even after multiple washes, the colors stay vibrant. My family loves them too!",
+      text: "I was looking for quality bedsheets that would last, and PlantVigor delivered beyond my expectations! The cotton feels so soft against my skin, and even after multiple washes, the colors stay vibrant. My family loves them too!",
       author: "Priya Sharma",
       location: "Delhi",
       image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150&h=150&fit=crop",
@@ -125,7 +125,7 @@ const FeaturedStories = () => {
       image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=150&h=150&fit=crop"
     },
     {
-      text: "During the monsoon season, I needed quick-drying bedsheets, and a friend recommended Fika. Not only do they dry fast, but they're also so comfortable! Customer service helped me choose the right material over WhatsApp. Truly amazing!",
+      text: "During the monsoon season, I needed quick-drying bedsheets, and a friend recommended PlantVigor. Not only do they dry fast, but they're also so comfortable! Customer service helped me choose the right material over WhatsApp. Truly amazing!",
       author: "Kavita Reddy",
       location: "Bangalore",
       image: "https://images.unsplash.com/photo-1607346256330-dee7af15f7c5?w=150&h=150&fit=crop"
@@ -443,7 +443,7 @@ const FeaturedStories = () => {
           </div>
           <div className="blog-hero-description">
             <p>Explore Our Articles on Fashion Trends, Styling Tips, and Sustainable Fashion</p>
-            <p>  Stay Informed with the Latest in Slow Living from Fika</p>
+            <p>  Stay Informed with the Latest in Slow Living from PlantVigor</p>
 
           </div>
           <div className="search-container">

@@ -17,7 +17,7 @@ const Notifications = () => {
           <span className="notification-date">May 3, 2024</span>
         </div>
         <div className="notification-item">
-          <span className="notification-title">Welcome to Fika!</span>
+          <span className="notification-title">Welcome to PlantVigor!</span>
           <span className="notification-message">Thank you for signing up. Enjoy shopping with us!</span>
           <span className="notification-date">May 1, 2024</span>
         </div>

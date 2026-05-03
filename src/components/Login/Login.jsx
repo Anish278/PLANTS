@@ -1,51 +1,35 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { FaClock, FaEye, FaEyeSlash } from 'react-icons/fa';
+import { FaEye, FaEyeSlash, FaLeaf, FaSeedling, FaArrowRight } from 'react-icons/fa';
 import './Login.css';
-import fikaLogo from '/fika_logo1.webp';
 
-
-const sliderImages = [
-  'https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
- 'https://images.unsplash.com/photo-1540551079-b1236c0cd8ef?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80',
-
-  'https://images.unsplash.com/photo-1578500494198-246f612d3b3d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80'
+const plantImages = [
+  'https://images.unsplash.com/photo-1545241047-6083a3684587?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1463936575829-25148e1db1b8?auto=format&fit=crop&w=900&q=80',
+  'https://images.unsplash.com/photo-1416879595882-3373a0480b5b?auto=format&fit=crop&w=900&q=80',
 ];
 
 const Login = () => {
   const navigate = useNavigate();
-  const { login, loginWithGoogle, isAuthenticated, user } = useAuth();
+  const { login, loginWithGoogle, isAuthenticated } = useAuth();
   const [formData, setFormData] = useState({ emailOrPhone: '', password: '' });
   const [showPassword, setShowPassword] = useState(false);
   const [sliderIndex, setSliderIndex] = useState(0);
-  const [currentTime, setCurrentTime] = useState(new Date());
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
 
-  // Redirect if already authenticated
   useEffect(() => {
-    if (isAuthenticated) {
-      // Always redirect to homepage after login (for both regular users and admins)
-      navigate('/');
-    }
+    if (isAuthenticated) navigate('/');
   }, [isAuthenticated, navigate]);
 
+  // Auto-play slider
   useEffect(() => {
-    const timer = setInterval(() => {
-      setCurrentTime(new Date());
-    }, 1000);
-
-    return () => clearInterval(timer);
+    const interval = setInterval(() => {
+      setSliderIndex(prev => (prev + 1) % plantImages.length);
+    }, 4000);
+    return () => clearInterval(interval);
   }, []);
-
-  const formatTime = (date) => {
-    return date.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true
-    });
-  };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -56,28 +40,23 @@ const Login = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    
     if (!formData.emailOrPhone || !formData.password) {
-      setError('Please fill in all fields');
+      setError('Saare fields bharo please!');
       return;
     }
-
     setIsLoading(true);
     try {
       await login({ email: formData.emailOrPhone, password: formData.password });
     } catch (error) {
-      let errorMessage = error.message || 'Login failed. Please try again.';
-      
-      // Handle Firebase auth errors with more user-friendly messages
-      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password') {
-        errorMessage = 'Invalid email or password. Please try again.';
+      let msg = 'Login fail hua. Dobara try karo.';
+      if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        msg = 'Email ya password galat hai.';
       } else if (error.code === 'auth/invalid-email') {
-        errorMessage = 'Please enter a valid email address.';
+        msg = 'Valid email daalo.';
       } else if (error.code === 'auth/too-many-requests') {
-        errorMessage = 'Too many unsuccessful login attempts. Please try again later.';
+        msg = 'Bahut zyada attempts. Thodi der baad try karo.';
       }
-      
-      setError(errorMessage);
+      setError(msg);
     } finally {
       setIsLoading(false);
     }
@@ -87,129 +66,190 @@ const Login = () => {
     setIsLoading(true);
     try {
       await loginWithGoogle();
-      // Navigation is handled by the useEffect that watches isAuthenticated
     } catch (error) {
-      setError(error.message || 'Google login failed. Please try again.');
+      setError(error.message || 'Google login fail hua.');
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Slider auto-play
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setSliderIndex((prev) => (prev + 1) % sliderImages.length);
-    }, 3500);
-    return () => clearInterval(interval);
-  }, []);
-
-  const handleDotClick = (idx) => setSliderIndex(idx);
-  const handlePrev = () => setSliderIndex((prev) => (prev - 1 + sliderImages.length) % sliderImages.length);
-  const handleNext = () => setSliderIndex((prev) => (prev + 1) % sliderImages.length);
-
-  const togglePasswordVisibility = () => {
-    setShowPassword(!showPassword);
-  };
-
   return (
-    <div className="login-bg-dark">
-      <div className="login-card-dark" >
-        <div className="login-slider">
-          <div className="slider-img-wrapper">
-            {sliderImages.map((img, idx) => (
-              <img
-                key={img}
-                src={img}
-                alt="slider"
-                className={`slider-img${idx === sliderIndex ? ' active' : ''}`}
-                style={{ opacity: idx === sliderIndex ? 1 : 0, zIndex: idx === sliderIndex ? 2 : 1 }}
+    <div className="pv-login-root">
+      {/* ── Left Panel ── */}
+      <div className="pv-login-left">
+        {/* Slider */}
+        <div className="pv-slider">
+          {plantImages.map((img, i) => (
+            <img
+              key={i}
+              src={img}
+              alt="plant"
+              className={`pv-slide${i === sliderIndex ? ' pv-slide-active' : ''}`}
+            />
+          ))}
+          {/* Dark overlay */}
+          <div className="pv-slide-overlay" />
+
+          {/* Brand badge */}
+          <div className="pv-brand">
+            <div className="pv-brand-icon">
+              <FaSeedling />
+            </div>
+            <div>
+              <div className="pv-brand-name">PlantVigor</div>
+              <div className="pv-brand-tagline">Nature's Best</div>
+            </div>
+          </div>
+
+          {/* Center text */}
+          <div className="pv-slide-text">
+            <div className="pv-slide-pill"><FaLeaf size={10} /> 100% Natural Plants</div>
+            <h2 className="pv-slide-heading">Bring Nature<br />Home Today</h2>
+            <p className="pv-slide-subtext">Premium plants, delivered fresh to your doorstep across India.</p>
+          </div>
+
+          {/* Dots */}
+          <div className="pv-dots">
+            {plantImages.map((_, i) => (
+              <button
+                key={i}
+                className={`pv-dot${i === sliderIndex ? ' pv-dot-active' : ''}`}
+                onClick={() => setSliderIndex(i)}
               />
             ))}
-            <button className="slider-arrow left" onClick={handlePrev}>&#8592;</button>
-            <button className="slider-arrow right" onClick={handleNext}>&#8594;</button>
-            <div className="slider-dots">
-              {sliderImages.map((_, idx) => (
-                <span
-                  key={idx}
-                  className={`slider-dot${idx === sliderIndex ? ' active' : ''}`}
-                  onClick={() => handleDotClick(idx)}
-                />
-              ))}
-            </div>
           </div>
-          <div className="slider-overlay">
-            <div className="slider-logo" style={{display: 'flex', flexDirection: 'column', alignItems: 'center', marginBottom: '12px'}}>
-              <img src={fikaLogo} alt="Fika Logo" style={{width: '90px', bottom:'50px',marginRight:'330px',
-              }} />
-              
-            </div>
-           
-            <div className="slider-caption">
-              <div>Capturing Moments,<br/>Creating Memories</div>
-            </div>
+
+          {/* Floating stat cards */}
+          <div className="pv-stat-card pv-stat-left">
+            <div className="pv-stat-num">12K+</div>
+            <div className="pv-stat-lbl">Happy Plant Parents</div>
+          </div>
+          <div className="pv-stat-card pv-stat-right">
+            <div className="pv-stat-num">500+</div>
+            <div className="pv-stat-lbl">Plant Varieties</div>
           </div>
         </div>
-        {/* Right: Login Form */}
-        <div className="login-form-dark">
-          <div className="login-form-title">Login To Your Account</div>
-          <div className="login-form-sub">
-            To make account? <Link to="/signup" className="signup-link">Sign-UP</Link>
+      </div>
+
+      {/* ── Right Panel ── */}
+      <div className="pv-login-right">
+        <div className="pv-form-wrap">
+
+          {/* Top logo (mobile) */}
+          <div className="pv-mobile-logo">
+            <div className="pv-brand-icon pv-brand-icon-sm"><FaSeedling /></div>
+            <span className="pv-mobile-logo-text">PlantVigor</span>
           </div>
-          {error && <div className="login-form-error">{error}</div>}
-          <form className="login-form-fields" onSubmit={handleSubmit}>
-            <div className="password-input-container">
-              <input
-                type="text"
-                name="emailOrPhone"
-                placeholder="Email or Phone Number"
-                value={formData.emailOrPhone}
-                onChange={handleChange}
-                required
-              />
+
+          {/* Heading */}
+          <div className="pv-form-eyebrow"><FaLeaf size={11} /> Welcome Back</div>
+          <h1 className="pv-form-title">Login to Your<br /><span className="pv-title-accent">Garden</span></h1>
+          <p className="pv-form-sub">
+            New here? <Link to="/signup" className="pv-signup-link">Create an account →</Link>
+          </p>
+
+          {/* Error */}
+          {error && (
+            <div className="pv-error">
+              <span>⚠</span> {error}
             </div>
-            <div className="password-input-container">
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Enter your password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-              />
-              <button
-                type="button"
-                className="password-toggle-btn"
-                onClick={togglePasswordVisibility}
-                aria-label={showPassword ? "Hide password" : "Show password"}
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </button>
+          )}
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="pv-form">
+            {/* Email */}
+            <div className="pv-field-group">
+              <label className="pv-label">Email Address</label>
+              <div className="pv-input-wrap">
+                <input
+                  type="text"
+                  name="emailOrPhone"
+                  value={formData.emailOrPhone}
+                  onChange={handleChange}
+                  placeholder="you@example.com"
+                  className="pv-input"
+                  required
+                  id="pv-email"
+                  autoComplete="email"
+                />
+              </div>
             </div>
-            <div className="forgot-password-link">
-              <Link to="/forgot-password">Forgot Password?</Link>
+
+            {/* Password */}
+            <div className="pv-field-group">
+              <div className="pv-label-row">
+                <label className="pv-label">Password</label>
+                <Link to="/forgot-password" className="pv-forgot">Forgot password?</Link>
+              </div>
+              <div className="pv-input-wrap">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  name="password"
+                  value={formData.password}
+                  onChange={handleChange}
+                  placeholder="Enter your password"
+                  className="pv-input"
+                  required
+                  id="pv-password"
+                  autoComplete="current-password"
+                />
+                <button
+                  type="button"
+                  className="pv-eye"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label="Toggle password"
+                >
+                  {showPassword ? <FaEyeSlash /> : <FaEye />}
+                </button>
+              </div>
             </div>
-            <div className="login-form-check">
-              <input type="checkbox" id="terms" required />
-              <label htmlFor="terms">I agree to the <Link to="/terms">Terms & Conditions</Link></label>
-            </div>
-            <button 
-              className="login-form-btn" 
+
+            {/* Terms */}
+            <label className="pv-check">
+              <input type="checkbox" required className="pv-checkbox" id="pv-terms" />
+              <span>I agree to the <Link to="/terms" className="pv-link">Terms &amp; Conditions</Link></span>
+            </label>
+
+            {/* Submit */}
+            <button
               type="submit"
+              className="pv-btn-primary"
               disabled={isLoading}
+              id="pv-login-btn"
             >
-              {isLoading ? 'Logging in...' : 'Login'}
+              {isLoading ? (
+                <span className="pv-spinner" />
+              ) : (
+                <>Login <FaArrowRight size={14} /></>
+              )}
             </button>
           </form>
-          <div className="login-form-or">or Login with</div>
-          <div className="login-form-socials">
-            <button 
-              className="social-btn google" 
-              type="button"
-              onClick={handleGoogleLogin}
-              disabled={isLoading}
-            >
-              Google
-            </button>
+
+          {/* Divider */}
+          <div className="pv-divider"><span>or continue with</span></div>
+
+          {/* Google */}
+          <button
+            type="button"
+            className="pv-btn-google"
+            onClick={handleGoogleLogin}
+            disabled={isLoading}
+            id="pv-google-btn"
+          >
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
+              <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
+              <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
+              <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
+            </svg>
+            Sign in with Google
+          </button>
+
+          {/* Bottom trust badges */}
+          <div className="pv-trust">
+            <span>🔒 Secure Login</span>
+            <span>🌱 Plant Community</span>
+            <span>🚀 Free Delivery</span>
           </div>
         </div>
       </div>
@@ -217,4 +257,4 @@ const Login = () => {
   );
 };
 
-export default Login; 
+export default Login;

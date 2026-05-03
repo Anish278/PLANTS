@@ -61,7 +61,7 @@ const ProductDetailWish = () => {
       try {
         setLoading(true);
         const productData = await getWishGenieProduct(id);
-        
+
         if (!productData) {
           setError('Product not found');
           setLoading(false);
@@ -75,11 +75,11 @@ const ProductDetailWish = () => {
         try {
           // First initialize the fields if they don't exist
           await initializeWishGenieFields(id);
-          
+
           // Then increment the views
           await incrementWishGenieViews(id);
           console.log('Successfully incremented views for Wish Genie product:', id);
-          
+
           // Fetch the updated product data to get the new view count
           const updatedProductData = await getWishGenieProduct(id);
           if (updatedProductData) {
@@ -119,7 +119,7 @@ const ProductDetailWish = () => {
       if (galleryRef.current && wrapperRef.current) {
         const wrapperRect = wrapperRef.current.getBoundingClientRect();
         const galleryRect = galleryRef.current.getBoundingClientRect();
-        
+
         if (wrapperRect.top <= 0 && wrapperRect.bottom >= galleryRect.height) {
           const translateY = -wrapperRect.top;
           galleryRef.current.style.transform = `translateY(${translateY}px)`;
@@ -138,14 +138,14 @@ const ProductDetailWish = () => {
     if (!id) return;
 
     const productRef = doc(db, 'wish_genie', id);
-    
+
     const unsubscribe = onSnapshot(productRef, (doc) => {
       if (doc.exists()) {
         const updatedData = { id: doc.id, ...doc.data() };
         console.log('Real-time update received:', updatedData);
         console.log('New views count:', updatedData.views);
         console.log('New bought count:', updatedData.bought);
-        
+
         // Update product state with real-time data
         setProduct(prevProduct => {
           if (prevProduct) {
@@ -165,7 +165,7 @@ const ProductDetailWish = () => {
   const handleAddToCart = async (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!isAuthenticated) {
       setShowLoginPrompt(true);
       return;
@@ -188,7 +188,7 @@ const ProductDetailWish = () => {
       id: product.id,
       name: product['Sticker Content Main'] || product.name || product.product_name || 'Product',
       price: Number(product.MRP) || Number(product.price) || 0,
-              image: product.image || '/placeholder-image.webp',
+      image: product.image || '/placeholder-image.webp',
       category: product.Category || product.category || '',
       quantity: quantity,
       discount: Number(product.discount) || 0,
@@ -196,7 +196,7 @@ const ProductDetailWish = () => {
       product_code: product['Product code'] || product.product_code || '',
     };
     addToCart(productToAdd);
-    
+
     // Increment bought count when product is added to cart
     try {
       await incrementWishGenieBought(id);
@@ -204,7 +204,7 @@ const ProductDetailWish = () => {
     } catch (error) {
       console.error('Error incrementing Wish Genie bought count:', error);
     }
-    
+
     setShowSuccessMessage(true);
     setTimeout(() => setShowSuccessMessage(false), 1000);
   };
@@ -212,7 +212,7 @@ const ProductDetailWish = () => {
   const handleAddToWishlist = (e) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!isAuthenticated) {
       setShowLoginPrompt(true);
       return;
@@ -228,7 +228,7 @@ const ProductDetailWish = () => {
   const handleRelatedProductAction = async (e, action, product) => {
     e.preventDefault();
     e.stopPropagation();
-    
+
     if (!isAuthenticated) {
       setShowLoginPrompt(true);
       return;
@@ -247,7 +247,7 @@ const ProductDetailWish = () => {
         product_code: product['Product code'] || product.product_code || '',
       };
       addToCart(productToAdd);
-      
+
       // Increment bought count when related product is added to cart
       try {
         await incrementWishGenieBought(product.id);
@@ -292,11 +292,11 @@ const ProductDetailWish = () => {
   // Get all images from the comma-separated image field
   const productImages = product.image
     ? product.image.split(',').map(img => img.trim()).filter(Boolean).map(img => {
-        if (img.startsWith('http') || img.startsWith('https') || img.startsWith('/')) {
-          return img;
-        }
-        return `/${img}`;
-      })
+      if (img.startsWith('http') || img.startsWith('https') || img.startsWith('/')) {
+        return img;
+      }
+      return `/${img}`;
+    })
     : ['/placeholder-image.webp'];
 
   const ProductGallery = ({ images }) => {
@@ -486,7 +486,7 @@ const ProductDetailWish = () => {
                 <p>{product['Product Description']}</p>
                 {product['Burning Instructions'] && (
                   <>
-                    <h4 style={{marginTop: '24px', color: 'var(--text-dark)'}}>Burning Instructions</h4>
+                    <h4 style={{ marginTop: '24px', color: 'var(--text-dark)' }}>Burning Instructions</h4>
                     <p>{product['Burning Instructions']}</p>
                   </>
                 )}
@@ -530,9 +530,8 @@ const ProductDetailWish = () => {
                 <img src={relatedProduct.image} alt={relatedProduct['Sticker Content Main']} />
                 <div className="product-actions">
                   <button
-                    className={`action-btn wishlist-btn ${
-                      contextWishlist.includes(relatedProduct.id) ? "active" : ""
-                    }`}
+                    className={`action-btn wishlist-btn ${contextWishlist.includes(relatedProduct.id) ? "active" : ""
+                      }`}
                     onClick={(e) => handleRelatedProductAction(e, 'wishlist', relatedProduct)}
                   >
                     <FaHeart />
@@ -548,7 +547,7 @@ const ProductDetailWish = () => {
               <div className="related-product-info">
                 <h3>{relatedProduct['Sticker Content Main']}</h3>
                 <div className="product-price">
-                  <span className="current-price" style={{fontSize: '1.1rem'}}>₹{relatedProduct.MRP}</span>
+                  <span className="current-price" style={{ fontSize: '1.1rem' }}>₹{relatedProduct.MRP}</span>
                 </div>
               </div>
             </div>

@@ -18,7 +18,7 @@ const Contact = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-    
+
     try {
       // Check if email already exists
       const contactsQuery = query(
@@ -26,7 +26,7 @@ const Contact = () => {
         where("email", "==", form.email)
       );
       const querySnapshot = await getDocs(contactsQuery);
-      
+
       if (!querySnapshot.empty) {
         throw new Error('A contact with this email address already exists');
       }
@@ -36,7 +36,7 @@ const Contact = () => {
         ...form,
         timestamp: serverTimestamp(),
       });
-      
+
       setSuccess(true);
       setForm({ name: "", email: "", message: "" });
     } catch (err) {
@@ -114,45 +114,45 @@ const Contact = () => {
   };
 
   return (
-    <motion.div 
+    <motion.div
       className="contact-container"
       initial="hidden"
       animate="visible"
       variants={containerVariants}
     >
       <motion.div className="contact-card">
-        <motion.div 
+        <motion.div
           className="contact-card-content"
           variants={containerVariants}
           whileHover={{ scale: 1.005 }}
           transition={{ duration: 0.3 }}
         >
-          <motion.div 
+          <motion.div
             className="contact-form-area"
             variants={formVariants}
           >
-            <motion.h1 
+            <motion.h1
               variants={itemVariants}
               whileHover={{ scale: 1.02 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               Let's talk
             </motion.h1>
-            <motion.p 
+            <motion.p
               variants={itemVariants}
               whileHover={{ scale: 1.01 }}
               transition={{ type: "spring", stiffness: 300 }}
             >
               To request a quote or want to meet up for coffee, contact us directly or fill out the form and we will get back to you promptly.
             </motion.p>
-            
-            <motion.form 
-              className="contact-form" 
+
+            <motion.form
+              className="contact-form"
               onSubmit={handleSubmit}
               variants={itemVariants}
             >
-              <motion.div 
-                className="form-group" 
+              <motion.div
+                className="form-group"
                 variants={itemVariants}
                 whileHover={{ scale: 1.01 }}
               >
@@ -166,8 +166,8 @@ const Contact = () => {
                   required
                 />
               </motion.div>
-              <motion.div 
-                className="form-group" 
+              <motion.div
+                className="form-group"
                 variants={itemVariants}
                 whileHover={{ scale: 1.01 }}
               >
@@ -181,8 +181,8 @@ const Contact = () => {
                   required
                 />
               </motion.div>
-              <motion.div 
-                className="form-group" 
+              <motion.div
+                className="form-group"
                 variants={itemVariants}
                 whileHover={{ scale: 1.01 }}
               >
@@ -198,8 +198,8 @@ const Contact = () => {
                   whileFocus="focus"
                 ></motion.textarea>
               </motion.div>
-              <motion.button 
-                type="submit" 
+              <motion.button
+                type="submit"
                 className="submit-btn"
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
@@ -209,7 +209,7 @@ const Contact = () => {
                 {loading ? "Sending..." : "Send Message"}
               </motion.button>
               {success && (
-                <motion.div 
+                <motion.div
                   className="success-message"
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -222,7 +222,7 @@ const Contact = () => {
             </motion.form>
           </motion.div>
 
-          <motion.div 
+          <motion.div
             className="contact-info-area"
             variants={infoVariants}
           >
@@ -235,16 +235,16 @@ const Contact = () => {
               <motion.div className="contact-details-col" variants={itemVariants}>
                 <FaPhoneAlt size={32} />
                 <h3>Whatsapp Contact
-                  
+
                 </h3>
                 <p>+91 9355031087<br />Mon-Sat: 10 AM-6 PM</p>
               </motion.div>
               <motion.div className="contact-details-col" variants={itemVariants}>
                 <FaEnvelope size={32} />
                 <h3>Mail</h3>
-                <p >info@fika-india.com
-                <br />
-                wishgenie.shop@gmail.com.</p>
+                <p >info@plantvigor.com
+                  <br />
+                  wishgenie.shop@gmail.com.</p>
               </motion.div>
             </motion.div>
           </motion.div>

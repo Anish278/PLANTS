@@ -36,7 +36,7 @@ const PrivacyPolicy = () => {
           {activeTab === 'general' ? (
             <div className="policy-content">
               <h2>General Information</h2>
-              <p>At Fika, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or make a purchase.</p>
+              <p>At PlantVigor, we take your privacy seriously. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you visit our website or make a purchase.</p>
               
               <h3>Information We Collect</h3>
               <p>We collect information that you provide directly to us, including:</p>
@@ -126,7 +126,7 @@ const PrivacyPolicy = () => {
               <h3>Contact Us</h3>
               <p>If you have any questions about this Privacy Policy or our data practices, please contact us at:</p>
               <ul>
-                <li>Email: privacy@fika-india.com</li>
+                <li>Email: privacy@plantvigor.com</li>
                 <li>Phone: [Your Contact Number]</li>
                 <li>Address: [Your Business Address]</li>
               </ul>

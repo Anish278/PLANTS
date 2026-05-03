@@ -1,66 +1,100 @@
-import React from 'react'
-import { Link } from 'react-router-dom'
-import './Footer.css'
-
-
+import React from 'react';
+import { Link } from 'react-router-dom';
+import { FaFacebookF, FaInstagram, FaPinterestP, FaTwitter, FaLeaf } from 'react-icons/fa';
 
 const Footer = () => {
   return (
-    <footer className="footer">
-      <div className="footer-content">
-        {/* Left Section */}
-        <div className="footer-section">
-          <h3 className="footer-heading">CUSTOMER SERVICE</h3>
-          <div className="footer-links">
-            <Link to="/profile" className="footer-link">My Account</Link>
-            <Link to="/returns-exchange" className="footer-link">Returns and Exchange</Link>
-            <Link to="/track-order" className="footer-link">Order Tracking</Link>
-            <Link to="/terms" className="footer-link">Shipping Policy</Link>
-          </div>
-          <p className="copyright">© 2025 Fika. All rights reserved. Powered by Maydiv Infotech</p>
-        </div>
+    <footer className="bg-primary text-white pt-16 pb-8">
+      <div className="container mx-auto px-4 md:px-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-12">
 
-        {/* Middle Section - Logo */}
-        <div className="footer-logo-section">
-          <div className="footer-logo">
-            <Link to="/" className="logo">
-              <img style={{ width: "70px" }} src="/fika_page-001.webp" alt="logo" />
+          {/* Company Info */}
+          <div className="flex flex-col gap-6">
+            <Link to="/" className="flex items-center gap-3 group">
+              <div className="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center text-white rotate-12 group-hover:rotate-0 transition-transform duration-500 shadow-xl">
+                <span className="text-xl font-bold">P</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="text-xl font-display font-extrabold text-white leading-none tracking-tight">PlantVigor</span>
+                <span className="text-[10px] font-bold text-primary tracking-[0.2em] leading-none mt-1 uppercase">Nature's Best</span>
+              </div>
             </Link>
+            <p className="text-gray-400 text-sm leading-relaxed">
+              We bring the beauty of nature right to your doorstep. Our plants are ethically sourced and nurtured with love to ensure they thrive in your home.
+            </p>
+            <div className="flex gap-4">
+              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-accent transition-colors">
+                <FaFacebookF size={16} />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-accent transition-colors">
+                <FaInstagram size={16} />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-accent transition-colors">
+                <FaPinterestP size={16} />
+              </a>
+              <a href="#" className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-accent transition-colors">
+                <FaTwitter size={16} />
+              </a>
+            </div>
           </div>
 
-          <div className="social-links">
-            <a href="https://www.facebook.com/share/16UzZBD4fp/" className="social-link facebook">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M14 13.5h2.5l1-4H14v-2c0-1.03 0-2 2-2h1.5V2.14c-.326-.043-1.557-.14-2.857-.14C11.928 2 10 3.657 10 6.7v2.8H7v4h3V22h4v-8.5z" />
-              </svg>
-            </a>
-            <a href="https://www.instagram.com/fika.india.store?igsh=MTZmcnRrcHJzNHRvNw==" target="_blank" rel="noopener noreferrer" className="social-link instagram">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2c2.717 0 3.056.01 4.122.06 1.065.05 1.79.217 2.428.465.66.254 1.216.598 1.772 1.153a4.908 4.908 0 0 1 1.153 1.772c.247.637.415 1.363.465 2.428.047 1.066.06 1.405.06 4.122 0 2.717-.01 3.056-.06 4.122-.05 1.065-.218 1.79-.465 2.428a4.883 4.883 0 0 1-1.153 1.772 4.915 4.915 0 0 1-1.772 1.153c-.637.247-1.363.415-2.428.465-1.066.047-1.405.06-4.122.06-2.717 0-3.056-.01-4.122-.06-1.065-.05-1.79-.218-2.428-.465a4.89 4.89 0 0 1-1.772-1.153 4.904 4.904 0 0 1-1.153-1.772c-.248-.637-.415-1.363-.465-2.428C2.013 15.056 2 14.717 2 12c0-2.717.01-3.056.06-4.122.05-1.066.217-1.79.465-2.428a4.88 4.88 0 0 1 1.153-1.772A4.897 4.897 0 0 1 5.45 2.525c.638-.248 1.362-.415 2.428-.465C8.944 2.013 9.283 2 12 2zm0 5a5 5 0 1 0 0 10 5 5 0 0 0 0-10zm6.5-.25a1.25 1.25 0 1 0-2.5 0 1.25 1.25 0 0 0 2.5 0zM12 9a3 3 0 1 1 0 6 3 3 0 0 1 0-6z" />
-              </svg>
-            </a>
-            <a href="https://pin.it/70Ej2BbUG" target="_blank" rel="noopener noreferrer" className="social-link pinterest">
-              <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-                <path d="M12 2C6.477 2 2 6.477 2 12c0 4.237 2.636 7.855 6.356 9.312-.088-.791-.167-2.005.035-2.868.181-.78 1.172-4.97 1.172-4.97s-.299-.6-.299-1.486c0-1.39.806-2.428 1.81-2.428.852 0 1.264.64 1.264 1.408 0 .858-.546 2.14-.828 3.33-.236.995.5 1.807 1.48 1.807 1.778 0 3.144-1.874 3.144-4.58 0-2.393-1.72-4.068-4.177-4.068-2.845 0-4.515 2.135-4.515 4.34 0 .859.331 1.781.745 2.281a.3.3 0 0 1 .069.288l-.278 1.133c-.044.183-.145.223-.335.134-1.249-.581-2.03-2.407-2.407-2.03-3.874 0-3.154 2.292-6.052 6.608-6.052 3.469 0 6.165 2.473 6.165 5.776 0 3.447-2.173 6.22-5.19 6.22-1.013 0-1.965-.525-2.291-1.148l-.623 2.378c-.226.869-.835 1.958-1.244 2.621.937.29 1.931.446 2.962.446 5.523 0 10-4.477 10-10S17.523 2 12 2z" />
-              </svg>
-            </a>
+          {/* Quick Links */}
+          <div>
+            <h4 className="text-lg font-bold mb-6 text-white">Shop Categories</h4>
+            <ul className="flex flex-col gap-3">
+              <li><Link to="/category/Indoor" className="text-gray-400 hover:text-primary transition-colors text-sm font-medium">Indoor Plants</Link></li>
+              <li><Link to="/category/Outdoor" className="text-gray-400 hover:text-primary transition-colors text-sm font-medium">Outdoor Plants</Link></li>
+              <li><Link to="/category/Succulent" className="text-gray-400 hover:text-primary transition-colors text-sm font-medium">Succulents</Link></li>
+              <li><Link to="/category/Flowering" className="text-gray-400 hover:text-primary transition-colors text-sm font-medium">Flowering Plants</Link></li>
+              <li><Link to="/category/Bonsai" className="text-gray-400 hover:text-primary transition-colors text-sm font-medium">Bonsai Special</Link></li>
+            </ul>
           </div>
+
+          {/* Support */}
+          <div>
+            <h4 className="text-lg font-bold mb-6 text-white">Customer Support</h4>
+            <ul className="flex flex-col gap-3">
+              <li><Link to="/track-order" className="text-gray-400 hover:text-primary transition-colors text-sm font-medium">Track Your Order</Link></li>
+              <li><Link to="/returns-exchange" className="text-gray-400 hover:text-primary transition-colors text-sm font-medium">Returns & Exchange</Link></li>
+              <li><Link to="/terms" className="text-gray-400 hover:text-primary transition-colors text-sm font-medium">Shipping Policy</Link></li>
+              <li><Link to="/privacy-policy" className="text-gray-400 hover:text-primary transition-colors text-sm font-medium">Privacy Policy</Link></li>
+              <li><Link to="/contact" className="text-gray-400 hover:text-primary transition-colors text-sm font-medium">Contact Us</Link></li>
+            </ul>
+          </div>
+
+          {/* Newsletter */}
+          <div>
+            <h4 className="text-lg font-bold mb-6 text-white">Newsletter</h4>
+            <p className="text-gray-400 text-sm mb-6">
+              Subscribe to get special offers, free giveaways, and once-in-a-lifetime deals.
+            </p>
+            <form className="flex flex-col gap-3">
+              <input
+                type="email"
+                placeholder="Your email address"
+                className="bg-white/10 border border-white/20 rounded-xl px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all"
+              />
+              <button className="bg-accent hover:bg-accent-dark text-white font-bold py-3 rounded-xl transition-all shadow-lg shadow-accent/20">
+                Subscribe Now
+              </button>
+            </form>
+          </div>
+
         </div>
 
-        {/* Right Section */}
-        <div className="footer-section">
-          <h3 className="footer-heading">MORE DETAILS</h3>
-          <div className="footer-links">
-            <Link to="/about" className="footer-link">About Us</Link>
-            <Link to="" className="footer-link">Career</Link>
-            <Link to="" className="footer-link">Our Business</Link>
-            <Link to="/privacy-policy" className="footer-link">Privacy Policy</Link>
-            <Link to="/terms" className="footer-link">Terms & Conditions</Link>
+        <hr className="border-white/10 mb-8" />
+
+        <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-gray-500 text-xs">
+          <p>© 2026 PlantVigor Nursery. All rights reserved.</p>
+          <div className="flex gap-6">
+            <Link to="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+            <Link to="/privacy-policy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <Link to="/about" className="hover:text-white transition-colors">Cookie Policy</Link>
           </div>
         </div>
       </div>
     </footer>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

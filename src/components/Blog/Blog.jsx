@@ -164,7 +164,7 @@ const FeaturedStories = () => {
           </div>
           <div className="blog-hero-description">
             <p>Explore Our Articles on Fashion Trends, Styling Tips, and Sustainable Fashion</p>
-            <p>Stay Informed with the Latest in Fashion from Fika</p>
+            <p>Stay Informed with the Latest in Fashion from PlantVigor</p>
           </div>
           <div className="search-container">
             <div className="search-bar">
